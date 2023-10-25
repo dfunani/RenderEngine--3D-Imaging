@@ -1,13 +1,9 @@
-from math import tan, pi, sqrt
-from models.constants import Resolution, Buffers
+from math import tan, pi
+from models.constants import Resolution
 from models.objects.vectors import Vector3Float, Vector, RGB
 from models.files.filemanagers import FileManager
-from numpy.typing import NDArray
-from typing import Any
-from numpy.linalg import norm
 from models.objects.primitives import Object
-from models.objects.materials import Material
-import random
+from random import uniform
 
 class Raytracer:
     FOV: float = pi / 2.0
@@ -34,9 +30,9 @@ class Raytracer:
         )
         if not scene["result"]:
             Raytracer.background_color = RGB(
-                (random.uniform(0.0, 0.1)),
-                (random.uniform(0.0, 0.1)),
-                (random.uniform(0.0, 1.0)),
+                (uniform(0.0, 0.1)),
+                (uniform(0.0, 0.1)),
+                (uniform(0.0, 1.0)),
             )
             return Raytracer.background_color
         return scene["material"].color
@@ -44,7 +40,7 @@ class Raytracer:
     def exportColorGradient(
         self, filename: str = "untitled", extension: str = "ppm"
     ) -> None:
-        framebuffer: list[Vector3Float] = Buffers.frameBuffer()
+        framebuffer: list[Vector3Float] = Object.frameBuffer()
 
         for j in range(Resolution.__HEIGHT__):
             for i in range(Resolution.__WIDTH__):
@@ -59,7 +55,7 @@ class Raytracer:
     def exportPrimitives(
         self, objects: Object, filename: str = "untitled", extension: str = "ppm"
     ) -> None:
-        framebuffer: list[Vector3Float] = Buffers.frameBuffer()
+        framebuffer: list[Vector3Float] = Object.frameBuffer()
 
         for j in range(Resolution.__HEIGHT__):
             for i in range(Resolution.__WIDTH__):

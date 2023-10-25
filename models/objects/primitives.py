@@ -1,14 +1,17 @@
 from math import sqrt
-from typing import Any
-from numpy.typing import NDArray
 from models.objects.vectors import Vector3Float, RGB
-from models.objects.materials import Material
+from models.scene.materials import Material
 from sys import float_info
+from models.constants import Resolution
 
 
 class Object:
     def __init__(self, material: Material):
         self.material: Material = material
+
+    @staticmethod
+    def frameBuffer(width=Resolution.__WIDTH__, height=Resolution.__HEIGHT__) -> list:
+        return [Vector3Float() for _ in range(width * height)]
 
     @staticmethod
     def scene_intersect(
@@ -23,16 +26,15 @@ class Object:
         result: dict = {}
         for object in objects:
             intersect = object.ray_intersect(originalRayDirection, rayDirection)
-            if intersect and intersect["dist_i"] < objects_dist:
-                objects_dist = intersect["dist_i"]
+            if intersect and intersect.get("dist_i") < objects_dist:
+                objects_dist = intersect.get("dist_i")
                 result = {
-                    "point": originalRayDirection + rayDirection * intersect["dist_i"],
+                    "point": originalRayDirection + rayDirection * intersect.get("dist_i"),
                     "N": (point - object.center).normalize(),
                     "material": object.material,
                 }
 
         return {**result, "result": objects_dist < 1000}
-
 
 class Sphere(Object):
     def __init__(

@@ -1,5 +1,3 @@
-from typing import Self
-from numpy import array
 from re import sub
 from models.constants import Resolution
 
