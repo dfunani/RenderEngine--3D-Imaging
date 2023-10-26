@@ -1,5 +1,5 @@
 from math import tan, pi
-from models.constants import Resolution
+from models.interfaces.constants import Resolution
 from models.objects.vectors import Vector3Float, Vector, RGB
 from models.files.filemanagers import FileManager
 from models.objects.primitives import Object
@@ -24,7 +24,7 @@ class Raytracer:
         rayOriginalDirection: Vector,
         rayDirection: Vector,
         objects: Object,
-    ) -> Vector:
+    ) -> RGB:
         scene: dict = Object.scene_intersect(
             rayOriginalDirection, rayDirection, objects
         )

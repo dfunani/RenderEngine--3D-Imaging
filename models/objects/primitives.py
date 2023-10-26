@@ -2,11 +2,13 @@ from math import sqrt
 from models.objects.vectors import Vector3Float, RGB
 from models.scene.materials import Material
 from sys import float_info
-from models.constants import Resolution
+from models.interfaces.constants import Resolution
 
 
 class Object:
     def __init__(self, material: Material):
+        if not isinstance(material, Material):
+            raise TypeError("material must be of type Material")
         self.material: Material = material
 
     @staticmethod
@@ -41,7 +43,7 @@ class Sphere(Object):
         self,
         center: Vector3Float = Vector3Float(),
         radius: float = 1.0,
-        material: Material = RGB(0, 0, 0),
+        material: Material = Material(RGB(0, 0, 0)),
     ) -> None:
         super().__init__(material)
         self.center: Vector3Float = center

@@ -1,5 +1,5 @@
 from re import sub
-from models.constants import Resolution
+from models.interfaces.constants import Resolution
 
 
 class FileManager():
