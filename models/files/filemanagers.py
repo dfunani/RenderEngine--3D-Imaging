@@ -17,7 +17,7 @@ class FileManager():
     def write(
         self, framebuffer: list, mode="wb", fileheader: bytes = "P6\n{} {}\n255\n"
     ):
-        with open(self.filename, mode) as ofs:
+        with open("./output/" + self.filename, mode) as ofs:
             match mode:
                 case "wb":
                     ofs.write(

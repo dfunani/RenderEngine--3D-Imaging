@@ -17,10 +17,24 @@ class Vector:
             return Vector(*(a + b for a, b in zip(self.coordinates, other)))
         return Vector(*(a + other for a in self.coordinates))
 
+    # def __iadd__(self, other) -> Self:
+    #     if isinstance(other, Vector):
+    #         self.coordinates = [a + b for a, b in zip(self.coordinates, other)]
+    #     else:
+    #         self.coordinates = [a + other for a in self.coordinates]
+    #     return self
+
     def __sub__(self, other) -> Self:
         if isinstance(other, Vector):
             return Vector(*(a - b for a, b in zip(self.coordinates, other)))
         return Vector(*(a - other for a in self.coordinates))
+
+    # def __isub__(self, other) -> Self:
+    #     if isinstance(other, Vector):
+    #         self.coordinates = [a - b for a, b in zip(self.coordinates, other)]
+    #     else:
+    #         self.coordinates = [a - other for a in self.coordinates]
+    #     return self
 
     def __mul__(self, other) -> Self:
         if isinstance(other, Vector):
@@ -37,6 +51,12 @@ class Vector:
             return all(a > b for a, b in zip(self.coordinates, other))
         else:
             return all(a > other for a in self.coordinates)
+
+    def __neg__(self):
+        return Vector(*(-a for a in self.coordinates))
+
+    def __pow__(self, exponent):
+        return Vector(*(a**exponent for a in self.coordinates))
 
     def __lt__(self, other):
         if isinstance(other, Vector):
