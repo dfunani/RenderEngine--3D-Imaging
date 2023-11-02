@@ -36,45 +36,45 @@ class Object:
     def scene_intersect(
         originalRayDirection: Vector3Float, rayDirection: Vector3Float, objects: list
     ) -> dict:
-        objects_dist: float = float_info.max
-        result: dict = {}
-        for object in objects:
-            intersect = object.ray_intersect(originalRayDirection, rayDirection)
-            if intersect and intersect.get("dist_i") < objects_dist:
-                objects_dist = intersect.get("dist_i")
-                result = {
-                    "point": originalRayDirection + rayDirection * objects_dist,
-                    "N": (
-                        result.get("point", Vector3Float()) - object.center
-                    ).normalize(),
-                    "material": object.material,
-                }
-        checkerboard_dist: float = float_info.max
-        if abs(rayDirection.coordinates[1]) > 1e-3:
+        pt: Vector3Float = Vector3Float()
+        N: Vector3Float = Vector3Float()
+        material: Material = Material(RGB())
+
+        nearest_dist: float = 1e10
+        if abs(rayDirection.coordinates[1]) > 0.001:
             d: float = (
                 -(originalRayDirection.coordinates[1] + 4) / rayDirection.coordinates[1]
             )
-            pt: Vector3Float = originalRayDirection + rayDirection * d
+            p: Vector3Float = (originalRayDirection + rayDirection) * d
             if (
-                d > 0
-                and abs(pt.coordinates[1]) < 10
-                and pt.coordinates[2] < -10
-                and pt.coordinates[2] > -30
-                and d < objects_dist
+                d > 0.001
+                and d < nearest_dist
+                and abs(p.coordinates[0]) < 10
+                and p.coordinates[2] < -10
+                and p.coordinates[2] > -30
             ):
-                checkerboard_dist = d
-                material = Material(RGB())
+                nearest_dist = d
+                pt = p
+                N = Vector3Float(0, 1, 0)
                 material.color = (
-                    Vector3Float(0.3, 0.3, 0.3)
-                    if (int(0.5 * pt.coordinates[0] + 1000) + int(0.5 * pt.coordinates[2])) & 1
-                    else Vector3Float(0.3, 0.2, 0.1)
+                    RGB(0.3, 0.3, 0.3)
+                    if (
+                        int(0.5 * pt.coordinates[0] + 1000)
+                        + int(0.5 * pt.coordinates[2])
+                    )
+                    & 1
+                    else RGB(0.3, 0.2, 0.1)
                 )
-                result = {
-                    "point": pt,
-                    "N": Vector3Float(0, 1, 0),
-                    "material": material,
-                }
-        return {**result, "result": min(objects_dist, checkerboard_dist) < 1000}
+
+        for object in objects:
+            intersect: dict = object.ray_intersect(originalRayDirection, rayDirection)
+            if not intersect.get("result") or intersect.get("dist_i") > nearest_dist:
+                continue
+            nearest_dist = intersect.get("dist_i")
+            pt = originalRayDirection + rayDirection * nearest_dist
+            N = (pt - object.center).normalize()
+            material = object.material
+        return {"result": nearest_dist < 1000, "point": pt, "N": N, "material": material}
 
 
 class Sphere(Object):
@@ -97,17 +97,16 @@ class Sphere(Object):
         squareDistance: float = distance.dot(distance) - (tca * tca)
 
         if squareDistance > self.squareRadius:
-            return False
+            return {"dist_i": 0, "result": False}
 
         thc: float = sqrt(self.squareRadius - squareDistance)
         dist_i = tca - thc
-        t1 = tca + thc
+        dist_i_2 = tca + thc
 
-        if dist_i < 0:
-            dist_i = t1
-
-        if dist_i < 0:
-            return False
+        if dist_i > 0.001:
+            return {"dist_i": dist_i, "result": True}
+        if dist_i_2 > 0.001:
+            return {"dist_i": dist_i_2, "result": True}
 
         # The previous conditions checked for non-intersection. If none of them was met, there is an intersection.
-        return {"dist_i": dist_i}
+        return {"dist_i": dist_i, "result": False}
