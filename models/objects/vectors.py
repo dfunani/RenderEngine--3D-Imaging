@@ -99,6 +99,15 @@ class Vector:
     def __str__(self) -> str:
         return " ".join(str(a) for a in self.coordinates)
 
+    def __and__(self, other):
+        return (
+            self.coordinates[0]
+            if other == 0
+            else self.coordinates[1]
+            if other == 1
+            else self.coordinates[2]
+        )
+
 
 class RGB(Vector):
     def __init__(self, red=0.0, green=0.0, blue=0.0):

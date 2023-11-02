@@ -1,5 +1,5 @@
 from models.files.filemanagers import FileManager
-from os import listdir, remove
+from os import listdir, remove, getcwd
 from models.objects.primitives import Object
 
 
@@ -11,5 +11,5 @@ def test_filemanager():
         == "testing&&&&filename"
     )
     filemanager.write(Object.frameBuffer())
-    assert "testing_filename.test" in listdir("./output/")
-    remove("./output/testing_filename.test")
+    assert "testing_filename.test" in listdir(getcwd() + "/output/")
+    remove(getcwd() + "/output/testing_filename.test")

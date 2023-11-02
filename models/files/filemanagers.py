@@ -1,6 +1,6 @@
 from re import sub
 from models.interfaces.constants import Resolution
-
+from os import getcwd
 
 class FileManager():
     def __init__(self, filename: str, extension: str) -> None:
@@ -17,7 +17,7 @@ class FileManager():
     def write(
         self, framebuffer: list, mode="wb", fileheader: bytes = "P6\n{} {}\n255\n"
     ):
-        with open("./output/" + self.filename, mode) as ofs:
+        with open(getcwd() + "/output/" + self.filename, mode) as ofs:
             match mode:
                 case "wb":
                     ofs.write(
