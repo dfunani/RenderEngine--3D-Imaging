@@ -28,7 +28,7 @@ class Raytracer:
         objects: list,
         lights: list,
         depth: int = 0,
-    ) -> RGB:
+    ) -> Vector:
         scene: dict = Object.scene_intersect(
             rayOriginalDirection, rayDirection, objects
         )

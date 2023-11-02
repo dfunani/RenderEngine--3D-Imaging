@@ -1,7 +1,6 @@
-import sys
 from displays.drawers import Drawer
 from models.interfaces.responses import Response
-from logging import error, warning, info, INFO
+from logging import error, info, INFO
 
 
 def main() -> Response:

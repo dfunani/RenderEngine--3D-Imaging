@@ -1,6 +1,8 @@
 from models.objects.primitives import Sphere
-from models.objects.vectors import RGB, Vector3Float
+from models.objects.vectors import RGB, Vector3Float, Vector
 from models.raytracer.renders import Raytracer
+from models.scene.lighting import Lighting
+
 
 def test_raytracer():
     raytracer = Raytracer()
@@ -12,9 +14,10 @@ def test_raytracer():
 
 def test_trace():
     raytracer = Raytracer()
-    r = raytracer.trace(
+    r = raytracer.ray_trace(
         Vector3Float(0, 0, 0),
         Vector3Float(-1679.259456342853, 1679.259456342853, -1).normalize(),
         [Sphere(), Sphere(), Sphere()],
+        [Lighting(Vector3Float(), 1.5)],
     )
-    assert isinstance(r, RGB)
+    assert isinstance(r, Vector)

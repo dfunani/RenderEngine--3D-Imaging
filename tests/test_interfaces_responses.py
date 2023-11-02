@@ -1,5 +1,7 @@
 from models.interfaces.responses import Response
 
+
 def test_response():
-    for index, res in enumerate(Response, start=1):
-        assert res.value == index
+    assert Response.error.value == 1
+    assert Response.success.value == 2
+    assert Response.warning.value == 3
