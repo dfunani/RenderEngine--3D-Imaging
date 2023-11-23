@@ -120,6 +120,20 @@ class Drawer:
             )
             spheres.append(
                 Sphere(
+                    Vector3Float(-5.0, -1.5, -12),
+                    2,
+                    ivory,
+                )
+            )
+            spheres.append(
+                Sphere(
+                    Vector3Float(-5.0, 5.0, -12),
+                    2,
+                    red_rubber,
+                )
+            )
+            spheres.append(
+                Sphere(
                     Vector3Float(1.5, -0.5, -18),
                     3,
                     red_rubber,
