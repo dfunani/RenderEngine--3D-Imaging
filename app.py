@@ -1,31 +1,23 @@
-from displays.drawers import Drawer
-from models.interfaces.responses import Response
-from logging import error, info, INFO
+"""
+Module Summary: This module renders a line and writes its information to a file.
+"""
+
+from engines.renders import render_line
+from models.objetcs import Line
 
 
-def main() -> Response:
-    result: list = []
-    result.append(Drawer.drawSpheres())
-    result.append(Drawer.drawColorGradient())
-    result.append(Drawer.drawLightEmission())
-    if all(r == Response.success or r == Response.warning for r in result):
-        return Response.success
-    else:
-        return Response.error
+def main() -> None:
+    """
+    Renders a line and writes its information to a file.
+
+    Example:
+    --------
+    line = Line(10, 20, 100, 150, (255, 0, 0))  # Define the line
+    render_line(line, 200, 200, "output.txt")  # Render the line to "output.txt"
+    """
+    line = Line((10, 20), (100, 150), (255, 0, 0))
+    render_line(line, "output")
 
 
 if __name__ == "__main__":
-    from logging import basicConfig
-
-    basicConfig(
-        filename="app.log",
-        filemode="a",
-        format="%(name)s - %(levelname)s - %(message)s",
-        level=INFO,
-    )
-    info("======================== Render Engine Started =============================")
-    if main() != Response.error:
-        info("Render Engine Stopped")
-    else:
-        error("Render Engine Stopped - Errors Encountered")
-    info("============================================================================")
+    main()
