@@ -9,6 +9,7 @@ Functions:
 Returns:
     Functions:
         render_line: Renders a line on an image.
+        file_writer: Write the line or image to a file.
 """
 
 
@@ -18,43 +19,24 @@ from utils.generators import frame_buffer
 WIDTH = 800  # Width of the image
 HEIGHT = 600  # Height of the image
 
-def render_line(line: Line, filename="untitled") -> None:
+
+def render_line(lines: list[Line], filename="untitled") -> None:
     """
-    Renders the scene described by the line and saves the image to a specified filename.
+    Renders a list of lines on an image and writes the result to a file.
 
     Args:
-        line (Line): A Line object defining the line to be rendered.
+        lines (List[Line]): A list of Line objects defining the lines to be rendered.
         filename (str, optional): The name of the output file. Defaults to "untitled".
     """
     image = frame_buffer()
-
-    # Calculate differences between start and end points
-    dx, dy = line.interpolate()
-
-    # Determine the direction of the line
-    x_increment, y_increment = line.change_direction()
-
-    error = dx - dy  # Determine initial error
-
-    x0 = int(line.x0)
-    y0 = int(line.y0)
-    x1 = int(line.x1)
-    y1 = int(line.y1)
-
-    while x0 != x1 or y0 != y1:
-        # Color the current pixel as part of the line
-        image[y0][x0] = line.color
-
-        # Calculate error for next pixel
-        error_2 = 2 * error
-
-        if error_2 > -dy:
-            error -= dy
-            x0 += x_increment
-
-        if error_2 < dx:
-            error += dx
-            y0 += y_increment
+    for line in lines:
+        steep = line.swap_if_steep()
+        for x in range(int(line.x0), int(line.x1) + 1):
+            y = line.get_y_value(x)
+            if steep:
+                image[x][y] = line.color
+            else:
+                image[y][x] = line.color
 
     file_writer(image, filename)
 
