@@ -50,6 +50,6 @@ def file_writer(image, filename="untitled") -> None:
     """
     with open(f"./{filename}.ppm", "wb") as file:
         file.write(f"P6\n{WIDTH} {HEIGHT}\n255\n".encode())
-        for row in reversed(image[::-1]):
+        for row in reversed(image):
             for pixel in row:
                 file.write(bytes(pixel))

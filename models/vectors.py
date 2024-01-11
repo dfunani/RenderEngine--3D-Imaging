@@ -282,7 +282,9 @@ class Vector:
             "Multiplication is only defined for scalar or vector operands."
         )
 
-    def __rmul__(self, f: Union["Vector", int, float]) -> Union["Vector", ArgumentError]:
+    def __rmul__(
+        self, f: Union["Vector", int, float]
+    ) -> Union["Vector", ArgumentError]:
         """
         Multiplies the vector by a scalar when the scalar is on the right side.
 
@@ -355,11 +357,15 @@ class Vector:
         Returns:
             float: The dot product of the two vectors.
         """
-        if isinstance(other, Vector) and len(self.coordinates) == len(other.coordinates):
+        if isinstance(other, Vector) and len(self.coordinates) == len(
+            other.coordinates
+        ):
             return sum(a * b for a, b in zip(self.coordinates, other.coordinates))
-        raise ArgumentError("Dot product is only defined for vectors of the same dimension.")
+        raise ArgumentError(
+            "Dot product is only defined for vectors of the same dimension."
+        )
 
-    def norm(self)  -> float:
+    def norm(self) -> float:
         """
         Calculates the Euclidean norm (length) of the vector.
 
@@ -384,7 +390,7 @@ class Vector:
 
 class Vector3(Vector):
     """
-    Vector2 Class
+    Vector3 Class
 
     Represents a 2D vector with coordinates x and y.
 
@@ -393,6 +399,7 @@ class Vector3(Vector):
     Attributes:
         x (float): The x-coordinate of the vector.
         y (float): The y-coordinate of the vector.
+        z (float): The y-coordinate of the vector.
 
     Methods:
         __init__: Initializes a Vector2 object with given x and y coordinates.
@@ -416,9 +423,10 @@ class Vector3(Vector):
             y (float): The y-coordinate of the vector.
             z (float): The z-coordinate of the vector.
         """
+
         super().__init__(x, y, z)
 
-    def cross(self, other: 'Vector') -> "Vector":
+    def cross(self, other: "Vector") -> "Vector":
         """
         Calculates the cross product of two 3D Vector objects.
 
