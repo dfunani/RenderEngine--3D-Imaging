@@ -12,7 +12,7 @@ Returns:
         file_writer: Write the line or image to a file.
 """
 
-
+from os import getcwd
 from models.objetcs import Line  # Import the Line class from your objects module
 from utils.generators import frame_buffer
 
@@ -48,7 +48,7 @@ def file_writer(image, filename="untitled") -> None:
         image (list): Image buffer to write.
         filename (str, optional): Name to be given to the exported file. Defaults to "untitled".
     """
-    with open(f"./{filename}.ppm", "wb") as file:
+    with open(getcwd() + f"/{filename}.ppm", "wb") as file:
         file.write(f"P6\n{WIDTH} {HEIGHT}\n255\n".encode())
         for row in reversed(image):
             for pixel in row:
