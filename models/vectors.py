@@ -125,7 +125,7 @@ class Vector:
         """
         return not self.__eq__(other)
 
-    def __lt__(self, other: Union["Vector", int, float]) -> Union[bool, ValueError]:
+    def __lt__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
         """
         Checks if the norm of the vector is less than the norm of
         another vector or a scalar.
@@ -142,9 +142,9 @@ class Vector:
             return self.norm() < other.norm()
         if isinstance(other, (int, float)):
             return self.norm() < other
-        raise ValueError("Comparison is only defined for vectors or scalar values.")
+        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
 
-    def __le__(self, other: Union["Vector", int, float]) -> Union[bool, ValueError]:
+    def __le__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
         """
         Checks if the norm of the vector is less than or equal to the norm of another
         vector or a scalar.
@@ -161,9 +161,9 @@ class Vector:
             return self.norm() <= other.norm()
         if isinstance(other, (int, float)):
             return self.norm() <= other
-        raise ValueError("Comparison is only defined for vectors or scalar values.")
+        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
 
-    def __gt__(self, other: Union["Vector", int, float]) -> Union[bool, ValueError]:
+    def __gt__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
         """
         Checks if the norm of the vector is greater than the norm of another vector or
         a scalar.
@@ -180,9 +180,9 @@ class Vector:
             return self.norm() > other.norm()
         if isinstance(other, (int, float)):
             return self.norm() > other
-        raise ValueError("Comparison is only defined for vectors or scalar values.")
+        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
 
-    def __ge__(self, other: Union["Vector", int, float]) -> Union[bool, ValueError]:
+    def __ge__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
         """
         Checks if the norm of the vector is greater than or equal to the norm of
         another vector or a scalar.
@@ -199,7 +199,7 @@ class Vector:
             return self.norm() >= other.norm()
         if isinstance(other, (int, float)):
             return self.norm() >= other
-        raise ValueError("Comparison is only defined for vectors or scalar values.")
+        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
 
     def __len__(self) -> int:
         """
@@ -212,7 +212,7 @@ class Vector:
 
     def __add__(
         self, other: Union["Vector", int, float]
-    ) -> Union["Vector", ValueError]:
+    ) -> Union["Vector", ArgumentError]:
         """
         Adds two vectors element-wise or adds a scalar to each coordinate.
 
@@ -232,11 +232,11 @@ class Vector:
         if isinstance(other, (int, float)):
             result_coordinates = [comp + other for comp in self.coordinates]
             return Vector(*result_coordinates)
-        raise ValueError("Addition is only defined for vectors or scalar values.")
+        raise ArgumentError("Addition is only defined for vectors or scalar values.")
 
     def __sub__(
         self, other: Union["Vector", int, float]
-    ) -> Union["Vector", ValueError]:
+    ) -> Union["Vector", ArgumentError]:
         """
         Subtracts another vector element-wise.
 
@@ -256,11 +256,11 @@ class Vector:
         if isinstance(other, (int, float)):
             result_coordinates = [comp - other for comp in self.coordinates]
             return Vector(*result_coordinates)
-        raise ValueError(
+        raise ArgumentError(
             "Subtraction is only defined for vectors of the same dimension."
         )
 
-    def __mul__(self, f: Union["Vector", int, float]) -> Union["Vector", ValueError]:
+    def __mul__(self, f: Union["Vector", int, float]) -> Union["Vector", ArgumentError]:
         """
         Multiplies the vector by a scalar or performs element-wise multiplication.
 
@@ -278,11 +278,11 @@ class Vector:
                 a * b for a, b in zip(self.coordinates, f.coordinates)
             ]
             return Vector(*result_coordinates)
-        raise ValueError(
+        raise ArgumentError(
             "Multiplication is only defined for scalar or vector operands."
         )
 
-    def __rmul__(self, f: Union["Vector", int, float]) -> Union["Vector", ValueError]:
+    def __rmul__(self, f: Union["Vector", int, float]) -> Union["Vector", ArgumentError]:
         """
         Multiplies the vector by a scalar when the scalar is on the right side.
 
@@ -327,7 +327,7 @@ class Vector:
         """
         return self.coordinates[index]
 
-    def __xor__(self, other: "Vector") -> Union["Vector", ValueError]:
+    def __xor__(self, other: "Vector") -> Union["Vector", ArgumentError]:
         if isinstance(other, Vector) and len(self.coordinates) == len(
             other.coordinates
         ):
@@ -336,7 +336,7 @@ class Vector:
                 a ^ b for a, b in zip(self.coordinates, other.coordinates)
             ]
             return Vector(*result_coordinates)
-        raise ValueError(
+        raise ArgumentError(
             "Bitwise XOR is only defined for vectors of the same dimension."
         )
 
@@ -345,7 +345,7 @@ class Vector:
     #     result_coordinates = [coord << shift_amount for coord in self.coordinates]
     #     return Vector(*result_coordinates)
 
-    def dot(self, other: "Vector") -> Union["Vector", ValueError]:
+    def dot(self, other: "Vector") -> Union["Vector", ArgumentError]:
         """
         Calculates the dot product of two vectors.
 
@@ -357,7 +357,7 @@ class Vector:
         """
         if isinstance(other, Vector) and len(self.coordinates) == len(other.coordinates):
             return sum(a * b for a, b in zip(self.coordinates, other.coordinates))
-        raise ValueError("Dot product is only defined for vectors of the same dimension.")
+        raise ArgumentError("Dot product is only defined for vectors of the same dimension.")
 
     def norm(self)  -> float:
         """
@@ -429,7 +429,7 @@ class Vector3(Vector):
             Vector: A new Vector representing the cross product.
 
         Raises:
-            ValueError: If either of the vectors is not 3D.
+            ArgumentError: If either of the vectors is not 3D.
         """
         return Vector(
             self.coordinates[1] * other.coordinates[2]

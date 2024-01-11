@@ -33,23 +33,39 @@ class Line:
 
     def __init__(
         self,
-        point_1: tuple[Union[int, float]],
-        point_2: tuple[Union[int, float]],
-        color: tuple[
-            Union[int, float], Union[int, float], Union[int, float]
-        ],
+        point_1: tuple[Union[int, float], Union[int, float]],
+        point_2: tuple[Union[int, float], Union[int, float]],
+        color: tuple[Union[int, float], Union[int, float], Union[int, float]],
     ) -> None:
         """
         Initializes a Line object with coordinates and color.
 
         Args:
-            point_1 (tuple[Union[int, float]]): Coordinates of the
+            point_1 (tuple[Union[int, float], Union[int, float]]): Coordinates of the
                 starting point (x, y).
-            point_2 (tuple[Union[int, float]]): Coordinates of the
+            point_2 (tuple[Union[int, float], Union[int, float]]): Coordinates of the
                 ending point (x, y).
             color (tuple[Union[int, float], Union[int, float],
                 Union[int, float]]): Color of the line.
         """
+        if not isinstance(point_1, tuple):
+            raise TypeError("Point 1 must be a tuple[3] of int | float")
+        if not isinstance(point_2, tuple):
+            raise TypeError("Point 2 must be a tuple[3] of int | float")
+
+        if not isinstance(color, tuple):
+            raise TypeError("Color must be a tuple[3] of int | float")
+        for i, v in enumerate(zip(point_1, point_2)):
+            p1, p2 = v
+            if not isinstance(p1, (int, float)):
+                raise ValueError(f"Point 1 Coordinate[{i}] must be int | float")
+            if not isinstance(p2, (int, float)):
+                raise ValueError(f"Point 2 Coordinate[{i}] must be int | float")
+
+        for i, v in enumerate(color):
+            if not isinstance(v, (int, float)):
+                raise ValueError(f"Color Coordinate[{i}] must be int | float")
+
         self.x0, self.y0 = point_1
         self.x1, self.y1 = point_2
         self.color = color
