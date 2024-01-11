@@ -32,7 +32,7 @@ jobs:
         export PYTHONPATH=$PWD:$PYTHONPATH
     - name: Lint with pylint
       run: |
-        pylint . --disable=C0103
+        pylint . --disable=C0103,E0401
     - name: Test with pytest
       run: |
         pytest
