@@ -26,8 +26,8 @@ def test_render_only():
     """
     line = Line((0, 0), (-800, -599), (255, 0, 0))
     render_line([line], "tests/output/test_render")
-    assert "test_render.ppm" in listdir(cwd + "/tests/output/")
-    remove(cwd + "/tests/output/test_render.ppm")
+    assert "test_render.ppm" in listdir("tests/output/")
+    remove("tests/output/test_render.ppm")
 
 
 def test_render_only_error_offscreen():
@@ -45,5 +45,5 @@ def test_writer():
     """
     image = frame_buffer()
     file_writer(image, "tests/output/test_writer")
-    assert "test_writer.ppm" in listdir(cwd + "/tests/output/")
-    remove(cwd + "/tests/output/test_writer.ppm")
+    assert "test_writer.ppm" in listdir("tests/output/")
+    remove("tests/output/test_writer.ppm")
