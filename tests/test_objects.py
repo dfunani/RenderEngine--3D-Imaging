@@ -2,7 +2,7 @@
     """
 from pytest import raises
 
-from models.objetcs import Line
+from models.primitives import Line
 
 x0 = 0
 x1 = 1

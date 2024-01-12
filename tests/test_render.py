@@ -15,7 +15,7 @@ Returns:
 
 from os import listdir, remove, getcwd
 from pytest import raises
-from models.objetcs import Line
+from models.primitives import Line
 from engines.renders import render_line, file_writer
 from utils.generators import frame_buffer
 cwd = getcwd()

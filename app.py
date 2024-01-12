@@ -2,8 +2,8 @@
 Module Summary: This module renders a line and writes its information to a file.
 """
 
-from engines.renders import render_line
-from models.objetcs import Line
+from engines.renders import render_lines, render_model
+from models.primitives import Line
 from models.types.exceptions import ArgumentError
 
 
@@ -26,7 +26,8 @@ def main(filename="output/main") -> None:
         return {"message": "Couldn't Create Line(s)", "error": str(error)}
 
     try:
-        render_line(lines, filename)
+        render_lines(lines, f"{filename}_lines")
+        render_model("obj/african_head.obj", f"{filename}_model")
     except (ArgumentError, ValueError, TypeError) as error:
         return {"message": "Couldn't Render Line Scene", "error": str(error)}
 
@@ -34,4 +35,4 @@ def main(filename="output/main") -> None:
 
 
 if __name__ == "__main__":
-    main()
+    print(main())
