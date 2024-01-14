@@ -71,12 +71,12 @@ class Vector:
         result = vector + Vector(4, 5, 6)
     """
 
-    def __init__(self, *args: tuple[Union[int, float]]) -> None:
+    def __init__(self, *args: Union[int, float]) -> None:
         """
         Initializes a Vector object with given coordinates.
 
         Args:
-            args (float): Variable number of coordinates for the vector.
+            args (int, float): Variable number of coordinates for the vector.
 
         Raises:
             TypeError: If any argument is not of type int or float.
@@ -87,7 +87,7 @@ class Vector:
                 raise TypeError(f"Argument at position {index} is an INVALID type.")
         if not args:
             raise ArgumentError("No arguments were provided.")
-        self.coordinates = args
+        self.coordinates = tuple(args)
 
     def __str__(self) -> str:
         """
@@ -388,6 +388,41 @@ class Vector:
         return Vector(*[comp * l / length for comp in self.coordinates])
 
 
+class Vector2(Vector):
+    """
+    Vector2 Class
+
+    Represents a 2D vector with coordinates x and y.
+
+    ...
+
+    Attributes:
+        x (int, float): The x-coordinate of the vector.
+        y (int, float): The y-coordinate of the vector.
+
+    Methods:
+        __init__: Initializes a Vector2 object with given x and y coordinates.
+
+    Usage:
+        v = Vector2(1, 2)
+    """
+
+    def __init__(
+        self,
+        x: Union[int, float] = 0,
+        y: Union[int, float] = 0,
+    ) -> None:
+        """
+        Initializes a Vector2 object with given x and y coordinates.
+
+        Args:
+            x (int, float): The x-coordinate of the vector.
+            y (int, float): The y-coordinate of the vector.
+        """
+        super().__init__(x, y)
+        self.x, self.y = self.coordinates
+
+
 class Vector3(Vector):
     """
     Vector3 Class
@@ -397,9 +432,9 @@ class Vector3(Vector):
     ...
 
     Attributes:
-        x (float): The x-coordinate of the vector.
-        y (float): The y-coordinate of the vector.
-        z (float): The y-coordinate of the vector.
+        x (int, float): The x-coordinate of the vector.
+        y (int, float): The y-coordinate of the vector.
+        z (int, float): The y-coordinate of the vector.
 
     Methods:
         __init__: Initializes a Vector2 object with given x and y coordinates.
@@ -419,12 +454,13 @@ class Vector3(Vector):
         Initializes a Vector2 object with given x and y coordinates.
 
         Args:
-            x (float): The x-coordinate of the vector.
-            y (float): The y-coordinate of the vector.
-            z (float): The z-coordinate of the vector.
+            x (int, float): The x-coordinate of the vector.
+            y (int, float): The y-coordinate of the vector.
+            z (int, float): The z-coordinate of the vector.
         """
 
         super().__init__(x, y, z)
+        self.x, self.y, self.z = self.coordinates
 
     def cross(self, other: "Vector") -> "Vector":
         """
@@ -440,47 +476,13 @@ class Vector3(Vector):
             ArgumentError: If either of the vectors is not 3D.
         """
         return Vector(
-            self.coordinates[1] * other.coordinates[2]
-            - self.coordinates[2] * other.coordinates[1],
-            self.coordinates[2] * other.coordinates[0]
-            - self.coordinates[0] * other.coordinates[2],
-            self.coordinates[0] * other.coordinates[1]
-            - self.coordinates[1] * other.coordinates[0],
+            self.y * other.z
+            - self.z * other.y,
+            self.z * other.x
+            - self.x * other.z,
+            self.x * other.y
+            - self.y * other.x,
         )
-
-
-class Vector2(Vector):
-    """
-    Vector2 Class
-
-    Represents a 2D vector with coordinates x and y.
-
-    ...
-
-    Attributes:
-        x (float): The x-coordinate of the vector.
-        y (float): The y-coordinate of the vector.
-
-    Methods:
-        __init__: Initializes a Vector2 object with given x and y coordinates.
-
-    Usage:
-        v = Vector2(1, 2)
-    """
-
-    def __init__(
-        self,
-        x: Union[int, float] = 0,
-        y: Union[int, float] = 0,
-    ) -> None:
-        """
-        Initializes a Vector2 object with given x and y coordinates.
-
-        Args:
-            x (float): The x-coordinate of the vector.
-            y (float): The y-coordinate of the vector.
-        """
-        super().__init__(x, y)
 
 
 class RGB(Vector):
@@ -492,9 +494,9 @@ class RGB(Vector):
     ...
 
     Attributes:
-        r (float): The red component of the color.
-        g (float): The green component of the color.
-        b (float): The blue component of the color.
+        r (int, float): The red component of the color.
+        g (int, float): The green component of the color.
+        b (int, float): The blue component of the color.
 
     Methods:
         __init__: Initializes an RGB object with given r, g, and b components.
@@ -514,11 +516,12 @@ class RGB(Vector):
         Initializes an RGB object with given r, g, and b components.
 
         Args:
-            r (float): The red component of the color.
-            g (float): The green component of the color.
-            b (float): The blue component of the color.
+            r (int, float): The red component of the color.
+            g (int, float): The green component of the color.
+            b (int, float): The blue component of the color.
         """
         super().__init__(r, g, b)
+        self.r, self.g, self.b = self.coordinates
 
     def __str__(self) -> str:
         """
@@ -527,10 +530,5 @@ class RGB(Vector):
         Returns:
             str: A personalized string representation for RGB.
         """
-        if self.coordinates != 3:
-            raise ArgumentError("RGB Requires 3 coordinates.")
-        r = self.coordinates[0]
-        g = self.coordinates[1]
-        b = self.coordinates[2]
-        coordinates = f"(R: {r}, G: {g}, B: {b})"
+        coordinates = f"(R: {self.r}, G: {self.g}, B: {self.b})"
         return f"RGB Color {coordinates}"

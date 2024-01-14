@@ -8,23 +8,25 @@ Returns:
 
 from typing import Union
 
+from models.vectors import Vector2, RGB, Vector3
+
 
 class Line:
     """
     Represents a line between two points.
 
     Attributes:
-        point_1 (tuple[float, float]): Coordinates of the starting point (x, y).
-        x0 (float): x-coordinate of the starting point.
-        y0 (float): y-coordinate of the starting point.
-        point_2 (tuple[float, float]): Coordinates of the ending point (x, y).
-        x1 (float): x-coordinate of the ending point.
-        y1 (float): y-coordinate of the ending point.
+        point_1 (Vector2): Coordinates of the starting point (x, y).
+        x0 (int, float): x-coordinate of the starting point.
+        y0 (int, float): y-coordinate of the starting point.
+        point_2 (Vector2): Coordinates of the ending point (x, y).
+        x1 (int, float): x-coordinate of the ending point.
+        y1 (int, float): y-coordinate of the ending point.
         color (str): Color of the line.
 
     methods:
         __init__: Initializes a Line object with coordinates and color.
-        __str__:L Returns a string representation of the Line object.
+        __str__: Returns a string representation of the Line object.
         swap_if_steep: Determines if the line is steep and swaps the
         coordinates if necessary.
         interpolation: Calculates the interpolation parameter for a given x-coordinate.
@@ -33,41 +35,28 @@ class Line:
 
     def __init__(
         self,
-        point_1: tuple[Union[int, float], Union[int, float]],
-        point_2: tuple[Union[int, float], Union[int, float]],
-        color: tuple[Union[int, float], Union[int, float], Union[int, float]],
+        point_1: Vector2,
+        point_2: Vector2,
+        color: RGB,
     ) -> None:
         """
         Initializes a Line object with coordinates and color.
 
         Args:
-            point_1 (tuple[Union[int, float], Union[int, float]]): Coordinates of the
+            point_1 (Vector2): Coordinates of the
                 starting point (x, y).
-            point_2 (tuple[Union[int, float], Union[int, float]]): Coordinates of the
+            point_2 (Vector2): Coordinates of the
                 ending point (x, y).
-            color (tuple[Union[int, float], Union[int, float],
-                Union[int, float]]): Color of the line.
+            color (RGB): Color of the line.
         """
-        if not isinstance(point_1, tuple):
-            raise TypeError("Point 1 must be a tuple[3] of int | float")
-        if not isinstance(point_2, tuple):
-            raise TypeError("Point 2 must be a tuple[3] of int | float")
-
-        if not isinstance(color, tuple):
-            raise TypeError("Color must be a tuple[3] of int | float")
-        for i, v in enumerate(zip(point_1, point_2)):
-            p1, p2 = v
-            if not isinstance(p1, (int, float)):
-                raise ValueError(f"Point 1 Coordinate[{i}] must be int | float")
-            if not isinstance(p2, (int, float)):
-                raise ValueError(f"Point 2 Coordinate[{i}] must be int | float")
-
-        for i, v in enumerate(color):
-            if not isinstance(v, (int, float)):
-                raise ValueError(f"Color Coordinate[{i}] must be int | float")
-
-        self.x0, self.y0 = point_1
-        self.x1, self.y1 = point_2
+        if not isinstance(point_1, Vector2):
+            raise TypeError("Point 1 must be a 2D Vector")
+        if not isinstance(point_2, Vector2):
+            raise TypeError("Point 2 must be a 2D Vector")
+        if not isinstance(color, RGB):
+            raise TypeError("Color must be RGB")
+        self.x0, self.y0 = point_1.coordinates
+        self.x1, self.y1 = point_2.coordinates
         self.color = color
 
     def __str__(self) -> str:
@@ -77,7 +66,7 @@ class Line:
         Returns:
             str: String representation of the Line object.
         """
-        return f"Line from ({self.x0}, {self.y0}) to ({self.x1}, {self.y1}) with color {self.color}"
+        return f"Line from ({self.x0}, {self.y0}) to ({self.x1}, {self.y1}) with {self.color}"
 
     def swap_if_steep(self) -> bool:
         """
@@ -115,4 +104,63 @@ class Line:
         interpolation_value = (x - self.x0) / (self.x1 - self.x0)
         return int(
             self.y0 * (1.0 - interpolation_value) + self.y1 * interpolation_value
+        )
+
+
+class Triangle:
+    """
+    Represents a triangle in 2D space.
+
+    Attributes:
+        vertices (list[Vector2]): List of three Vector2 vertices (x, y).
+        color (RGB): RGB color of the triangle.
+    """
+
+    def __init__(self, vertices: list[Vector2], color: RGB):
+        """
+        Initializes a Triangle object with vertices and color.
+
+        Args:
+            vertices (list[Vector2]): List of three vertices (x, y).
+            color (Tuple[Vector3]): RGB color of the triangle.
+        """
+        if len(vertices) != 3:
+            raise ValueError("A triangle must have three Vector2 vertices.")
+        self.vertices = vertices
+        self.color = color
+
+    def draw_vertices(self, lines) -> list[Line]:
+        self.swap()
+        lines.append(Line(self.vertices[0], self.vertices[1], self.color))
+        lines.append(Line(self.vertices[1], self.vertices[2], self.color))
+        lines.append(Line(self.vertices[2], self.vertices[0], self.color))
+        return lines
+
+    def swap(self) -> None:
+        if self.vertices[0].y > self.vertices[1].y:
+            self.vertices[0], self.vertices[1] = self.vertices[1], self.vertices[0]
+        if self.vertices[0].y > self.vertices[2].y:
+            self.vertices[0], self.vertices[2] = self.vertices[2], self.vertices[0]
+        if self.vertices[1].y > self.vertices[2].y:
+            self.vertices[1], self.vertices[2] = self.vertices[2], self.vertices[1]
+
+    def barycentric(self, point: Vector2) -> Vector3:
+        u = Vector3(
+            self.vertices[2].x - self.vertices[0].x,
+            self.vertices[1].x - self.vertices[0].x,
+            self.vertices[0].x - point.x,
+        ) ^ Vector3(
+            self.vertices[2].y - self.vertices[0].y,
+            self.vertices[1].y - self.vertices[0].y,
+            self.vertices[0].y - point.y,
+        )
+
+        # Check if the triangle is degenerate
+        if abs(u.coordinates[2]) < 1:
+            return Vector3(-1, 1, 1)
+
+        return Vector3(
+            1 - (u.coordinates[0] + u.coordinates[1]) / u.coordinates[2],
+            u.coordinates[1] / u.coordinates[2],
+            u.coordinates[0] / u.coordinates[2],
         )
