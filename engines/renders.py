@@ -12,18 +12,21 @@ Returns:
         file_writer: Write the line or image to a file.
 """
 
+from random import randint
 from models.objects import Model
 from models.primitives import Line, Triangle
 from models.vectors import (
     RGB,
     Vector2,
+    Vector3,
 )  # Import the Line class from your objects module
 from utils.generators import frame_buffer
 
 WIDTH = 800  # Width of the image
 HEIGHT = 600  # Height of the image
 
-def render_2Dtriangles(triangles: list[Triangle], filename="triangle"):
+
+def render_triangle_shaded(triangles: list[Triangle], filename="triangle"):
     """
     Adds a Triangle object to the list of triangles to render.
 
@@ -37,56 +40,11 @@ def render_2Dtriangles(triangles: list[Triangle], filename="triangle"):
     """
     image = frame_buffer()
 
+    # Barycentric interpolation for shading
     for triangle in triangles:
-        for y in range(int(triangle.vertices[0].y), int(triangle.vertices[2].y) + 1):
-            for x in range(int(triangle.vertices[0].x), int(triangle.vertices[2].x) + 1):
-                P = Vector2(x, y)
-                bc_screen = triangle.barycentric(P)
-
-                if 0 <= bc_screen.x <= 1 and 0 <= bc_screen.y <= 1 and 0 <= bc_screen.z <= 1:
-                    color = (
-                       int( bc_screen.x * triangle.color[0] +
-                        bc_screen.y * triangle.color[0] +
-                        bc_screen.z * triangle.color[0]),
-                        int(bc_screen.x * triangle.color[1] +
-                        bc_screen.y * triangle.color[1] +
-                        bc_screen.z * triangle.color[1]),
-                        int(bc_screen.x * triangle.color[2] +
-                        bc_screen.y * triangle.color[2] +
-                        bc_screen.z * triangle.color[2]),
-                    )
-                    image[y][x] = color
-        
-
-    file_writer(image, filename, debug=True)
-    # image = frame_buffer()
-    # for triangle in triangles:
-    #     bboxmin = Vector2(WIDTH - 1, HEIGHT - 1)
-    #     bboxmax = Vector2(0, 0)
-    #     clamp = Vector2(WIDTH - 1, HEIGHT - 1)
-
-    #     # Update bounding box
-    #     for vertex in triangle.vertices:
-    #         bboxmin.x = max(0, min(bboxmin.x, vertex.x))
-    #         bboxmin.y = max(0, min(bboxmin.y, vertex.y))
-    #         bboxmax.x = min(clamp.x, max(bboxmax.x, vertex.x))
-    #         bboxmax.y = min(clamp.y, max(bboxmax.y, vertex.y))
-
-    #     # Iterate over pixels inside bounding box
-    #     for x in range(int(bboxmin.x), int(bboxmax.x) + 1):
-    #         for y in range(int(bboxmin.y), int(bboxmax.y) + 1):
-    #             P = Vector2(x, y)
-    #             bc_screen = triangle.barycentric(P)
-
-    #             # Check if the point is inside the triangle using barycentric coordinates
-    #             if (
-    #                 0 <= bc_screen.x <= 1
-    #                 and 0 <= bc_screen.y <= 1
-    #                 and 0 <= bc_screen.z <= 1
-    #             ):
-    #                 image[int(P.x)][int(P.y)] = triangle.color
-
-    # file_writer(image, filename, debug=True)
+        image = triangle.draw_triangle(image)
+    file_writer(image, filename)
+    
 
 def render_triangle_outline(triangles: list[Triangle], filename="triangle_outline"):
     # Render lines
@@ -104,8 +62,35 @@ def render_triangle_outline(triangles: list[Triangle], filename="triangle_outlin
                     image[y][x] = line.color
     file_writer(image, filename)
 
+
+def render_model_shaded(
+    model_filename: str, output_filename: str = "model_shaded", color=RGB(255, 255, 255)
+) -> None:
+    model = Model(model_filename)
+    image = frame_buffer()
+    light_dir = Vector3(0, 0, -1)
+    for face_index in range(1, len(model.faces) + 1):  # Faces are 1-indexed
+        face = model.get_face(face_index)
+        screen_coords = []
+        world_coords = []
+        for i in range(3):
+            v = model.get_vertex(face[i])
+            screen_coords.append(
+                Vector2((v.x + 1.0) * WIDTH / 2.0, (v.y + 1.0) * HEIGHT / 2.0)
+            )
+            world_coords.append(v)
+
+        n = (world_coords[2] - world_coords[0]) ^ (world_coords[1] - world_coords[0])
+        n.normalize()
+        intensity = light_dir * n
+        if intensity > 0:
+            triangle = Triangle([screen_coords[0], screen_coords[1], screen_coords[2]], RGB(255, 0, 0))
+            image = triangle.draw_triangle(image)
+    file_writer(image, output_filename)
+
+
 def render_model(
-    model_filename: str, output_filename: str = "model", color=RGB(0, 0, 0)
+    model_filename: str, output_filename: str = "model", color=RGB(255, 255, 255)
 ) -> None:
     """
     Renders a 3D model to an image file.

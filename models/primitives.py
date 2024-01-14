@@ -9,6 +9,7 @@ Returns:
 from typing import Union
 
 from models.vectors import Vector2, RGB, Vector3
+from utils.generators import HEIGHT, WIDTH
 
 
 class Line:
@@ -136,6 +137,44 @@ class Triangle:
         lines.append(Line(self.vertices[2], self.vertices[0], self.color))
         return lines
 
+    def draw_triangle(self, image):
+        t0, t1, t2 = self.vertices[0], self.vertices[1], self.vertices[2]
+
+        if t0.y == t1.y == t2.y:
+            return image  # I don't care about degenerate triangles
+
+        # Sort the vertices, t0, t1, t2 lower-to-upper (bubblesort)
+        self.swap()
+
+        total_height = t2.y - t0.y
+
+        for i in range(int(total_height) + 1):  # Adjusted the loop range
+            second_half = i > t1.y - t0.y or t1.y == t0.y
+            segment_height = t2.y - t1.y if second_half else t1.y - t0.y
+            alpha = i / total_height
+            beta = (i - (t1.y - t0.y) if second_half else 0) / segment_height
+
+            A = t0 + (t2 - t0) * alpha
+            B = t1 + (t2 - t1) * beta if second_half else t0 + (t1 - t0) * beta
+
+            if A.coordinates[0] > B.coordinates[0]:
+                A, B = B, A
+
+            for j in range(
+                max(0, int(A.coordinates[0])),
+                min(WIDTH - 1, int(B.coordinates[0])) + 1,
+            ):
+                # Adjust the starting point for the second half of the triangle
+                y_index = (
+                    max(0, min(HEIGHT - 1, int(t0.y + i)))
+                    if not second_half
+                    else max(0, min(HEIGHT - 1, int(t1.y + i)))
+                )
+                image[y_index][j] = self.color
+
+        return image
+
+
     def swap(self) -> None:
         if self.vertices[0].y > self.vertices[1].y:
             self.vertices[0], self.vertices[1] = self.vertices[1], self.vertices[0]
@@ -143,24 +182,3 @@ class Triangle:
             self.vertices[0], self.vertices[2] = self.vertices[2], self.vertices[0]
         if self.vertices[1].y > self.vertices[2].y:
             self.vertices[1], self.vertices[2] = self.vertices[2], self.vertices[1]
-
-    def barycentric(self, point: Vector2) -> Vector3:
-        u = Vector3(
-            self.vertices[2].x - self.vertices[0].x,
-            self.vertices[1].x - self.vertices[0].x,
-            self.vertices[0].x - point.x,
-        ) ^ Vector3(
-            self.vertices[2].y - self.vertices[0].y,
-            self.vertices[1].y - self.vertices[0].y,
-            self.vertices[0].y - point.y,
-        )
-
-        # Check if the triangle is degenerate
-        if abs(u.coordinates[2]) < 1:
-            return Vector3(-1, 1, 1)
-
-        return Vector3(
-            1 - (u.coordinates[0] + u.coordinates[1]) / u.coordinates[2],
-            u.coordinates[1] / u.coordinates[2],
-            u.coordinates[0] / u.coordinates[2],
-        )

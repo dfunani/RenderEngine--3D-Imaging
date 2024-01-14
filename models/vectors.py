@@ -329,17 +329,15 @@ class Vector:
         """
         return self.coordinates[index]
 
-    def __xor__(self, other: "Vector") -> Union["Vector", ArgumentError]:
-        if isinstance(other, Vector) and len(self.coordinates) == len(
-            other.coordinates
-        ):
-            # Bitwise XOR for each corresponding coordinate
-            result_coordinates = [
-                a ^ b for a, b in zip(self.coordinates, other.coordinates)
-            ]
-            return Vector(*result_coordinates)
-        raise ArgumentError(
-            "Bitwise XOR is only defined for vectors of the same dimension."
+    def __xor__(self, other):
+        """Overload the ^ operator for the cross product of two vectors."""
+        return Vector(
+            self.coordinates[1] * other.coordinates[2]
+            - self.coordinates[2] * other.coordinates[1],
+            self.coordinates[2] * other.coordinates[0]
+            - self.coordinates[0] * other.coordinates[2],
+            self.coordinates[0] * other.coordinates[1]
+            - self.coordinates[1] * other.coordinates[0],
         )
 
     # def __lshift__(self, shift_amount):
@@ -476,12 +474,9 @@ class Vector3(Vector):
             ArgumentError: If either of the vectors is not 3D.
         """
         return Vector(
-            self.y * other.z
-            - self.z * other.y,
-            self.z * other.x
-            - self.x * other.z,
-            self.x * other.y
-            - self.y * other.x,
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
         )
 
 

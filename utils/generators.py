@@ -25,5 +25,5 @@ def frame_buffer(width: int = WIDTH, height: int = HEIGHT):
         List[List[List[int]]]: A frame buffer representing the image with initial white color.
     """
     return [
-        [[255, 255, 255] for _ in range(width)] for _ in range(height)
+        [[0, 0, 0] for _ in range(width)] for _ in range(height)
     ]  # Initialize image with white color
