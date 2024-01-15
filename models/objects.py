@@ -111,7 +111,8 @@ class Model:
                 elif parts[0] == "f":
                     # Face line
                     indices = [int(idx.split("/")[0]) for idx in parts[1:]]
-                    self.faces.append(Vector3(*indices))
+                    x, y, z = indices[0], indices[1], indices[2]
+                    self.faces.append(Vector3(x, y, z))
 
     def get_vertex(self, index: int) -> Vector3:
         """
@@ -211,3 +212,73 @@ class Model:
             world_coordinates[1] - world_coordinates[0]
         )
         return normal, screen_coordinates
+
+    def barycentric(self, A, B, C, P):
+        s = [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+
+        for i in range(2):
+            s[i].coordinates[0] = C[i] - A[i]
+            s[i].coordinates[1] = B[i] - A[i]
+            s[i].coordinates[2] = A[i] - P[i]
+            s[i].x, s[i].y, s[i].z = (
+                s[i].coordinates[0],
+                s[i].coordinates[1],
+                s[i].coordinates[1],
+            )
+
+        u = s[0].cross(s[1])
+
+        if abs(u.z) > 1e-2:
+            return Vector3(1 - (u.x + u.y) / u.z, u.y / u.z, u.x / u.z)
+
+        return Vector3(-1, 1, 1)
+
+    def draw_model_barycentric(self, pts, zbuffer, image, color):
+        bboxmin = Vector2(float("inf"), float("inf"))
+        bboxmax = Vector2(float("-inf"), float("-inf"))
+        clamp = Vector2(WIDTH - 1, HEIGHT - 1)
+
+        for i in range(3):
+            for j in range(2):
+                bboxmin.coordinates[j] = max(0, min(bboxmin[j], pts[i][j]))
+                bboxmax.coordinates[j] = min(clamp[j], max(bboxmax[j], pts[i][j]))
+        bboxmin.x, bboxmin.y = (
+            bboxmin.coordinates[0],
+            bboxmin.coordinates[1],
+        )
+        bboxmax.x, bboxmax.y = (
+            bboxmax.coordinates[0],
+            bboxmax.coordinates[1],
+        )
+        P = Vector3()
+        for P.x in range(int(bboxmin.x), int(bboxmax.x) + 1):
+            for P.y in range(int(bboxmin.y), int(bboxmax.y) + 1):
+                bc_screen = self.barycentric(pts[0], pts[1], pts[2], P)
+
+                P.z = 0
+                for i in range(3):
+                    P.z += pts[i][2] * bc_screen[i]
+
+                # Clamp pixel coordinates to be within the valid range
+                P.x = max(0, min(WIDTH - 1, int(P.x)))
+                P.y = max(0, min(HEIGHT - 1, int(P.y)))
+
+                # Update zbuffer and image
+                zbuffer[int(P.x + P.y * WIDTH)] = P.z
+                image[P.y][P.x] = color
+
+        return image
+
+    def world2screen(self, v):
+        return Vector3(
+            int((v.x + 1.0) * WIDTH / 2.0 + 0.5),
+            int((v.y + 1.0) * HEIGHT / 2.0 + 0.5),
+            v.z,
+        )
+
+    def cross(self, v2):
+        return Vector3(
+            self.y * v2.z - self.z * v2.y,
+            self.z * v2.x - self.x * v2.z,
+            self.x * v2.y - self.y * v2.x,
+        )

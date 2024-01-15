@@ -6,6 +6,9 @@ from engines.renders import (
     render_triangle_outline,
     render_triangle_shaded,
     render_model_shaded,
+    render_sideview_triangles,
+    render_model_barycentric,
+    render_line_matrix
 )
 from models.primitives import Line, Triangle
 from models.types.exceptions import ArgumentError
@@ -48,12 +51,14 @@ def render_scene(filename="output/main") -> None:
     except (ArgumentError, ValueError, TypeError) as error:
         return {"message": "Couldn't create Triangle(s)", "error": str(error)}
 
+    render_line_matrix(output_filename=f"{filename}_line_matrix")
     try:
-        # render_lines(lines, f"{filename}_lines")
-        # render_model("obj/african_head.obj", f"{filename}_model")
-        render_model_shaded("obj/african_head.obj", f"{filename}_model_shaded")
-        render_triangle_outline(triangles, f"{filename}_triangle_outline")
-        render_triangle_shaded(triangles, f"{filename}_triangle_shaded")
+        # render_sideview_triangles(filename=f"{filename}_sideview_triangles")
+        # render_model_shaded("obj/african_head.obj", f"{filename}_model_shaded")
+        # render_triangle_outline(triangles, f"{filename}_triangle_outline")
+        # render_triangle_shaded(triangles, f"{filename}_triangle_shaded")
+        # render_model_barycentric("obj/african_head.obj", f"{filename}_3D_models")
+        pass
     except (ArgumentError, ValueError, TypeError) as error:
         return {"message": "Couldn't Render Scene(s)", "error": str(error)}
 

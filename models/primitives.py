@@ -52,7 +52,7 @@ Classes:
 
 from typing import Union
 
-from models.vectors import Vector2, RGB
+from models.vectors import Vector2, RGB, Vector3
 from utils.generators import HEIGHT, WIDTH
 
 
@@ -95,14 +95,18 @@ class Line:
                 ending point (x, y).
             color (RGB): Color of the line.
         """
-        if not isinstance(point_1, Vector2):
+        if not isinstance(point_1, (Vector2, Vector3)):
             raise TypeError("Point 1 must be a 2D Vector")
-        if not isinstance(point_2, Vector2):
+        if not isinstance(point_2, (Vector2, Vector3)):
             raise TypeError("Point 2 must be a 2D Vector")
         if not isinstance(color, RGB):
             raise TypeError("Color must be RGB")
-        self.x0, self.y0 = point_1.coordinates
-        self.x1, self.y1 = point_2.coordinates
+        self.x0, self.y0 = point_1.coordinates[0], point_1.coordinates[1]
+        self.x1, self.y1 = point_2.coordinates[0], point_2.coordinates[1]
+        if isinstance(point_1, Vector3):
+            self.z0 = point_1.coordinates[2]
+        if isinstance(point_2, Vector3):
+            self.z1 = point_2.coordinates[2]
         self.color = color
 
     def __str__(self) -> str:
@@ -171,7 +175,17 @@ class Line:
                 image[y][x] = self.color
         return image
 
+    def draw_line_matrix(self, image: list) -> list:
+        if self.x0 == self.x1:  # Vertical line, handle separately
+            for y in range(int(min(self.y0, self.y1)), int(max(self.y0, self.y1) + 1)):
+                image[y][int(self.x0)] = self.color
+        else:
+            m = (self.y1 - self.y0) / (self.x1 - self.x0)  # Slope of the line
+            for x in range(int(self.x0), int(self.x1) + 1):
+                y = int(self.y0 + m * (x - self.x0))
+                image[y][x] = self.color
 
+        return image
 class Triangle:
     """
     Represents a triangle in 2D space.
@@ -299,3 +313,5 @@ class Triangle:
             self.vertex_1, self.vertex_3 = self.vertex_3, self.vertex_1
         if self.vertex_2.y > self.vertex_3.y:
             self.vertex_2, self.vertex_3 = self.vertex_3, self.vertex_2
+
+    

@@ -9,6 +9,9 @@ Returns:
 
 """
 
+from models.vectors import RGB
+
+
 WIDTH = 800  # Width of the image
 HEIGHT = 600  # Height of the image
 
@@ -24,6 +27,5 @@ def frame_buffer(width: int = WIDTH, height: int = HEIGHT):
     Returns:
         List[List[List[int]]]: A frame buffer representing the image with initial white color.
     """
-    return [
-        [[0, 0, 0] for _ in range(width)] for _ in range(height)
-    ]  # Initialize image with white color
+    
+    return [[RGB(0, 0, 0) for _ in range(width)] for _ in range(height)]
