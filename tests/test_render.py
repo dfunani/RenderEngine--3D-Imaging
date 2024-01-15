@@ -16,7 +16,7 @@ Returns:
 from os import listdir, remove, getcwd
 from pytest import raises
 from models.primitives import Line
-from engines.renders import render_line, file_writer
+from engines.renders import render_triangle_outline, file_writer
 from utils.generators import frame_buffer
 cwd = getcwd()
 
@@ -25,7 +25,7 @@ def test_render_only():
     Test for rendering a single line and verifying the output file.
     """
     line = Line((0, 0), (-800, -599), (255, 0, 0))
-    render_line([line], "tests/output/test_render")
+    render_triangle_outline([line], "tests/output/test_render")
     assert "test_render.ppm" in listdir("tests/output/")
     remove("tests/output/test_render.ppm")
 
@@ -36,7 +36,7 @@ def test_render_only_error_offscreen():
     """
     line = Line((0, 0), (1000, 1000), (255, 0, 0))
     with raises(IndexError):
-        render_line([line])
+        render_triangle_outline([line])
 
 
 def test_writer():

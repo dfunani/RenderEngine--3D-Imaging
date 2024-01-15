@@ -1,19 +1,14 @@
 """Test module for objects
     """
 from pytest import raises
+from models.vectors import RGB
 
 from models.primitives import Line
-
-x0 = 0
-x1 = 1
-y0 = 2
-y1 = 3
-color = (255, 0, 0)
 
 
 def test_line_init():
     """test_line_class"""
-    line = Line((x0, y0), (x1, y1), color)
+    line = Line((1, 1), (1, 1), RGB())
     assert line.x0 == 0
     assert line.x1 == 1
     assert line.y0 == 2
@@ -23,7 +18,7 @@ def test_line_init():
 def test_line_init_error():
     """test line init when error raised - Passed str not tuple"""
     with raises(TypeError):
-        Line("(x0, y0)", (x1, y1), color)
+        Line("(x0, y0)", (1, 1), RGB())
 
 
 def test_line_init_error1():
@@ -32,8 +27,8 @@ def test_line_init_error1():
     """
     with raises(ValueError):
         Line(
-            (x0, y0),
-            (x1, y1),
+            (1, 1),
+            (1, 1),
             (
                 20,
                 "",
@@ -44,18 +39,18 @@ def test_line_init_error1():
 
 def test_str():
     """test str rep of the line class"""
-    line = Line((x0, y0), (x1, y1), color)
+    line = Line((1, 1), (1, 1), RGB())
     assert str(line) == "Line from (0, 2) to (1, 3) with color (255, 0, 0)"
 
 
 def test_swap_if_steep():
     """test steep check func"""
-    line = Line((x0, y0), (x1, y1), color)
+    line = Line((1, 1), (1, 1), RGB())
     assert not line.swap_if_steep()
 
 
 def test_get_y_value():
     """test getting y value"""
-    line = Line((x0, y0), (x1, y1), color)
+    line = Line((1, 1), (1, 1), RGB())
     y = line.get_y_value(line.x0)
     assert y == 2

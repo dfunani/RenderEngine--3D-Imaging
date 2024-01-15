@@ -2,13 +2,13 @@
 """
 from os import listdir, remove, getcwd
 
-from app import main
+from app import render_scene
 
 cwd = getcwd()
 
 def test_main():
     """Testing main"""
-    assert main("tests/output/test_main") == {
+    assert render_scene("tests/output/test_main") == {
         "message": "Successful: Created Line Scene and exported Successfully",
         "error": "",
     }

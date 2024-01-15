@@ -31,6 +31,7 @@ Usage:
     normalized_old_vector = old_vector.normalize()
 
 """
+
 from math import sqrt
 from typing import Union
 from models.types.exceptions import ArgumentError
@@ -87,7 +88,7 @@ class Vector:
                 raise TypeError(f"Argument at position {index} is an INVALID type.")
         if not args:
             raise ArgumentError("No arguments were provided.")
-        self.coordinates = tuple(args)
+        self.coordinates = list(args)
 
     def __str__(self) -> str:
         """
@@ -97,7 +98,7 @@ class Vector:
             str: A Descriptive string representation of the Vector object.
         """
         coordinates_str = ", ".join(map(str, self.coordinates))
-        return f"{self.__class__.__name__} with Coordinates: ({coordinates_str})"
+        return f"{self.__class__.__name__} at Coordinates: ({coordinates_str})"
 
     def __eq__(self, other: "Vector") -> bool:
         """
@@ -228,10 +229,10 @@ class Vector:
             result_coordinates = [
                 a + b for a, b in zip(self.coordinates, other.coordinates)
             ]
-            return Vector(*result_coordinates)
+            return self.__class__(*result_coordinates)
         if isinstance(other, (int, float)):
             result_coordinates = [comp + other for comp in self.coordinates]
-            return Vector(*result_coordinates)
+            return self.__class__(*result_coordinates)
         raise ArgumentError("Addition is only defined for vectors or scalar values.")
 
     def __sub__(
@@ -252,10 +253,10 @@ class Vector:
             result_coordinates = [
                 a - b for a, b in zip(self.coordinates, other.coordinates)
             ]
-            return Vector(*result_coordinates)
+            return self.__class__(*result_coordinates)
         if isinstance(other, (int, float)):
             result_coordinates = [comp - other for comp in self.coordinates]
-            return Vector(*result_coordinates)
+            return self.__class__(*result_coordinates)
         raise ArgumentError(
             "Subtraction is only defined for vectors of the same dimension."
         )
@@ -272,12 +273,12 @@ class Vector:
         """
         if isinstance(f, (int, float)):
             result_coordinates = [comp * f for comp in self.coordinates]
-            return Vector(*result_coordinates)
+            return self.__class__(*result_coordinates)
         if isinstance(f, Vector) and len(self.coordinates) == len(f.coordinates):
             result_coordinates = [
                 a * b for a, b in zip(self.coordinates, f.coordinates)
             ]
-            return Vector(*result_coordinates)
+            return self.__class__(*result_coordinates)
         raise ArgumentError(
             "Multiplication is only defined for scalar or vector operands."
         )
@@ -329,9 +330,9 @@ class Vector:
         """
         return self.coordinates[index]
 
-    def __xor__(self, other):
+    def __xor__(self, other) -> "Vector":
         """Overload the ^ operator for the cross product of two vectors."""
-        return Vector(
+        return self.__class__(
             self.coordinates[1] * other.coordinates[2]
             - self.coordinates[2] * other.coordinates[1],
             self.coordinates[2] * other.coordinates[0]
@@ -343,7 +344,7 @@ class Vector:
     # def __lshift__(self, shift_amount):
     #     # Left bit shift for each coordinate
     #     result_coordinates = [coord << shift_amount for coord in self.coordinates]
-    #     return Vector(*result_coordinates)
+    #     return self.__class__(*result_coordinates)
 
     def dot(self, other: "Vector") -> Union["Vector", ArgumentError]:
         """
@@ -383,8 +384,7 @@ class Vector:
             Vector: A new Vector representing the normalized vector.
         """
         length = self.norm()
-        return Vector(*[comp * l / length for comp in self.coordinates])
-
+        return self.__class__(*[comp * l / length for comp in self.coordinates])
 
 class Vector2(Vector):
     """
@@ -418,7 +418,7 @@ class Vector2(Vector):
             y (int, float): The y-coordinate of the vector.
         """
         super().__init__(x, y)
-        self.x, self.y = self.coordinates
+        self.x, self.y = self.coordinates[0], self.coordinates[1]
 
 
 class Vector3(Vector):
@@ -458,7 +458,7 @@ class Vector3(Vector):
         """
 
         super().__init__(x, y, z)
-        self.x, self.y, self.z = self.coordinates
+        self.x, self.y, self.z = self.coordinates[0], self.coordinates[1], self.coordinates[2]
 
     def cross(self, other: "Vector") -> "Vector":
         """
@@ -473,7 +473,7 @@ class Vector3(Vector):
         Raises:
             ArgumentError: If either of the vectors is not 3D.
         """
-        return Vector(
+        return self.__class__(
             self.y * other.z - self.z * other.y,
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x,
@@ -516,7 +516,7 @@ class RGB(Vector):
             b (int, float): The blue component of the color.
         """
         super().__init__(r, g, b)
-        self.r, self.g, self.b = self.coordinates
+        self.r, self.g, self.b = self.coordinates[0], self.coordinates[1], self.coordinates[2]
 
     def __str__(self) -> str:
         """
