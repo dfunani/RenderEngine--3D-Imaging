@@ -1,529 +1,291 @@
 """
-Vector Operations Module
+vector_math module
 
-This module defines a versatile Vector class for vector operations, including
-basic arithmetic, comparison, and vector-specific operations such as dot product
-and cross product.
+This module defines two vector classes, Vector2 and Vector3, representing 2D and 3D vectors, respectively.
+Each class provides essential vector operations, including addition, subtraction, scalar multiplication,
+cross product (for Vector3), dot product, vector normalization, and length calculation.
 
 Classes:
-    Vector: Base Class for vectors with various mathematical operations.
-    Vector2: Represents a 2D vector with various mathematical operations.
-    Vector3: Represents a 3D vector with various mathematical operations.
-    RGB: Represents a 3D vector with various mathematical operations, used to represent Colour.
+    - Vector2: A 2D vector class with x and y coordinates.
+    - Vector3: A 3D vector class with x, y, and z coordinates.
 
-Usage:
-    from vectors import Vector, Vector2, Vector3, RGB
+Specialized Classes:
+    - Vector2f: Specialization of Vector2 for float.
+    - Vector2i: Specialization of Vector2 for int.
+    - Vector3f: Specialization of Vector3 for float.
+    - Vector3i: Specialization of Vector3 for int.
 
-    # Create vectors
-    old_vector = Vector(1, 2, 3)
-    new_vector = Vector(1, 2, 3)
-    vector3 = Vector3(1, 2, 3)
-    color = RGB(224, 25, 6)
+Functions:
+    - float_to_int(v: Vector3f) -> Vector3i: Convert Vector3 with float components to Vector3 with int components.
+    - int_to_float(v: Vector3i) -> Vector3f: Convert Vector3 with int components to Vector3 with float components.
 
-    # Perform operations
-    result_addition = old_vector + new_vector
-    result_dot_product = old_vector @ new_vector
-    result_cross_product = old_vector.cross(new_vector)
-
-    # Other vector methods and comparisons
-    len_old_vector = len(old_vector)
-    bool_old_vector = bool(old_vector)
-    normalized_old_vector = old_vector.normalize()
-
+Ostream-like Functions:
+    - vec2_to_str(v: Vector2) -> str: Return a string representation for Vector2.
+    - vec3_to_str(v: Vector3) -> str: Return a string representation for Vector3.
 """
 
 from math import sqrt
 from typing import Union
-from models.types.exceptions import ArgumentError
 
 
-class Vector:
+class Vector2:
     """
-    Vector Class
+    A 2D vector class.
 
-    Represents a vector with various mathematical operations.
-
-    Methods:
-        __init__: Initializes a Vector object with given coordinates.
-        __str__: Returns a string representation of the Vector object.
-        __eq__: Checks if two Vector objects are equal.
-        __ne__: Checks if two Vector objects are not equal.
-        __lt__: Checks if the norm of the current Vector is less than the norm of another.
-        __le__: Checks if the norm of the current Vector is less than or equal
-                to the norm of another.
-        __gt__: Checks if the norm of the current Vector is greater than the norm of another.
-        __ge__: Checks if the norm of the current Vector is greater
-                than or equal to the norm of another.
-        __len__: Returns the number of coordinates in the Vec.
-        __add__: Adds two Vector objects element-wise.
-        __sub__: Subtracts one Vector object from another element-wise.
-        __mul__: Multiplies a Vector object by a scalar or element-wise by another Vec.
-        __rmul__: Allows scalar multiplication on the right side.
-        __matmul__: Calculates the dot product of two Vector objects.
-        __bool__: Checks if any coordinate in the Vector is non-zero.
-        __getitem__: Gets the value of a specific coordinate in the Vec.
-        __xor__: Performs bitwise XOR with another vector.
-        __lshift__: Performs left bit shift on each coordinate of the vector.
-        norm: Calculates the norm (length) of the Vec.
-        normalize: Normalizes the Vector to a specified length.
-
-    Usage:
-        vector = Vector(1, 2, 3)
-        result = vector + Vector(4, 5, 6)
+    Attributes:
+        x (float): The x-coordinate of the vector.
+        y (float): The y-coordinate of the vector.
     """
 
-    def __init__(self, *args: Union[int, float]) -> None:
+    def __init__(self, x: float = 0, y: float = 0):
         """
-        Initializes a Vector object with given coordinates.
+        Initialize a 2D vector with given x and y coordinates.
 
         Args:
-            args (int, float): Variable number of coordinates for the vector.
-
-        Raises:
-            TypeError: If any argument is not of type int or float.
-            ArgumentError: If no arguments are provided.
+            x (float): The x-coordinate.
+            y (float): The y-coordinate.
         """
-        for index, arg in enumerate(args):
-            if not isinstance(arg, (int, float)):
-                raise TypeError(f"Argument at position {index} is an INVALID type.")
-        if not args:
-            raise ArgumentError("No arguments were provided.")
-        self.coordinates = list(args)
+        self.x = x
+        self.y = y
 
     def __str__(self) -> str:
         """
-        Returns a string representation of the Vector object.
+        Return a string representation of the vector.
 
         Returns:
-            str: A Descriptive string representation of the Vector object.
+            str: A string representation of the vector.
         """
-        coordinates_str = ", ".join(map(str, self.coordinates))
-        return f"{self.__class__.__name__} at Coordinates: ({coordinates_str})"
+        return f"({self.x}, {self.y})"
 
-    def __eq__(self, other: "Vector") -> bool:
+    def __add__(self, other: "Vector2") -> "Vector2":
         """
-        Checks if two Vector objects are equal.
+        Add two vectors element-wise.
 
         Args:
-            other (Vector): Another Vector object for comparison.
+            other (Vector2): The vector to be added.
 
         Returns:
-            bool: True if the vectors are equal, False otherwise.
+            Vector2: The result of the addition.
         """
-        if isinstance(other, Vector):
-            return self.coordinates == other.coordinates
-        return False
+        return Vector2(self.x + other.x, self.y + other.y)
 
-    def __ne__(self, other: "Vector") -> bool:
+    def __sub__(self, other: "Vector2") -> "Vector2":
         """
-        Checks if two Vector objects are not equal.
+        Subtract two vectors element-wise.
 
         Args:
-            other (Vector): Another Vector object for comparison.
+            other (Vector2): The vector to be subtracted.
 
         Returns:
-            bool: True if the vectors are not equal, False if they are equal.
+            Vector2: The result of the subtraction.
         """
-        return not self.__eq__(other)
+        return Vector2(self.x - other.x, self.y - other.y)
 
-    def __lt__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
+    def __mul__(self, scalar: float) -> "Vector2":
         """
-        Checks if the norm of the vector is less than the norm of
-        another vector or a scalar.
+        Multiply the vector by a scalar.
 
         Args:
-            other (Union[Vector, int, float]): Another Vector object,
-            scalar, or float for comparison.
+            scalar (float): The scalar to multiply by.
 
         Returns:
-            bool: True if the norm of the vector is less than the norm of
-            the other value, False otherwise.
+            Vector2: The result of the multiplication.
         """
-        if isinstance(other, Vector):
-            return self.norm() < other.norm()
-        if isinstance(other, (int, float)):
-            return self.norm() < other
-        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
+        return Vector2(self.x * scalar, self.y * scalar)
 
-    def __le__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
+    def __getitem__(self, i: int) -> float:
         """
-        Checks if the norm of the vector is less than or equal to the norm of another
-        vector or a scalar.
+        Get the i-th component of the vector.
 
         Args:
-            other (Union[Vector, int, float]): Another Vector object, scalar, or float
-            for comparison.
+            i (int): The index of the component.
 
         Returns:
-            bool: True if the norm of the vector is less than or equal to the norm of the
-            other value, False otherwise.
-        """
-        if isinstance(other, Vector):
-            return self.norm() <= other.norm()
-        if isinstance(other, (int, float)):
-            return self.norm() <= other
-        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
-
-    def __gt__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
-        """
-        Checks if the norm of the vector is greater than the norm of another vector or
-        a scalar.
-
-        Args:
-            other (Union[Vector, int, float]): Another Vector object, scalar, or float
-            for comparison.
-
-        Returns:
-            bool: True if the norm of the vector is greater than the norm of the other
-            value, False otherwise.
-        """
-        if isinstance(other, Vector):
-            return self.norm() > other.norm()
-        if isinstance(other, (int, float)):
-            return self.norm() > other
-        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
-
-    def __ge__(self, other: Union["Vector", int, float]) -> Union[bool, ArgumentError]:
-        """
-        Checks if the norm of the vector is greater than or equal to the norm of
-        another vector or a scalar.
-
-        Args:
-            other (Union[Vector, int, float]): Another Vector object, scalar, or
-            float for comparison.
-
-        Returns:
-            bool: True if the norm of the vector is greater than or equal to the norm
-            of the other value, False otherwise.
-        """
-        if isinstance(other, Vector):
-            return self.norm() >= other.norm()
-        if isinstance(other, (int, float)):
-            return self.norm() >= other
-        raise ArgumentError("Comparison is only defined for vectors or scalar values.")
-
-    def __len__(self) -> int:
-        """
-        Returns the number of coordinates in the vector.
-
-        Returns:
-            int: The number of coordinates in the vector.
-        """
-        return len(self.coordinates)
-
-    def __add__(
-        self, other: Union["Vector", int, float]
-    ) -> Union["Vector", ArgumentError]:
-        """
-        Adds two vectors element-wise or adds a scalar to each coordinate.
-
-        Args:
-            other (Union[Vector, int, float]): Another Vector object, scalar, or float for addition.
-
-        Returns:
-            Vector: A new Vector resulting from the element-wise addition.
-        """
-        if isinstance(other, Vector) and len(self.coordinates) == len(
-            other.coordinates
-        ):
-            result_coordinates = [
-                a + b for a, b in zip(self.coordinates, other.coordinates)
-            ]
-            return self.__class__(*result_coordinates)
-        if isinstance(other, (int, float)):
-            result_coordinates = [comp + other for comp in self.coordinates]
-            return self.__class__(*result_coordinates)
-        raise ArgumentError("Addition is only defined for vectors or scalar values.")
-
-    def __sub__(
-        self, other: Union["Vector", int, float]
-    ) -> Union["Vector", ArgumentError]:
-        """
-        Subtracts another vector element-wise.
-
-        Args:
-            other (Vector): Another Vector object for subtraction.
-
-        Returns:
-            Vector: A new Vector resulting from the element-wise subtraction.
-        """
-        if isinstance(other, Vector) and len(self.coordinates) == len(
-            other.coordinates
-        ):
-            result_coordinates = [
-                a - b for a, b in zip(self.coordinates, other.coordinates)
-            ]
-            return self.__class__(*result_coordinates)
-        if isinstance(other, (int, float)):
-            result_coordinates = [comp - other for comp in self.coordinates]
-            return self.__class__(*result_coordinates)
-        raise ArgumentError(
-            "Subtraction is only defined for vectors of the same dimension."
-        )
-
-    def __mul__(self, f: Union["Vector", int, float]) -> Union["Vector", ArgumentError]:
-        """
-        Multiplies the vector by a scalar or performs element-wise multiplication.
-
-        Args:
-            f (Union[int, float, Vector]): The scalar or another Vector for multiplication.
-
-        Returns:
-            Vector: A new Vector resulting from the multiplication.
-        """
-        if isinstance(f, (int, float)):
-            result_coordinates = [comp * f for comp in self.coordinates]
-            return self.__class__(*result_coordinates)
-        if isinstance(f, Vector) and len(self.coordinates) == len(f.coordinates):
-            result_coordinates = [
-                a * b for a, b in zip(self.coordinates, f.coordinates)
-            ]
-            return self.__class__(*result_coordinates)
-        raise ArgumentError(
-            "Multiplication is only defined for scalar or vector operands."
-        )
-
-    def __rmul__(
-        self, f: Union["Vector", int, float]
-    ) -> Union["Vector", ArgumentError]:
-        """
-        Multiplies the vector by a scalar when the scalar is on the right side.
-
-        Args:
-            f (Union[int, float]): The scalar for multiplication.
-
-        Returns:
-            Vector: A new Vector resulting from the multiplication.
-        """
-        return self.__mul__(f)
-
-    def __matmul__(self, other) -> int:
-        """
-        Calculates the dot product of two vectors.
-
-        Args:
-            other (Vector): Another Vector object for the dot product.
-
-        Returns:
-            float: The dot product of the two vectors.
-        """
-        return self.dot(other)
-
-    def __bool__(self) -> bool:
-        """
-        Checks if any coordinate in the vector is non-zero.
-
-        Returns:
-            bool: True if any coordinate in the vector is non-zero, False otherwise.
-        """
-        return any(coord != 0 for coord in self.coordinates)
-
-    def __getitem__(self, index: int) -> Union[int, float]:
-        """
-        Gets the coordinate at the specified index.
-
-        Args:
-            index (int): The index of the coordinate to retrieve.
-
-        Returns:
-            float: The value of the coordinate at the specified index.
-        """
-        return self.coordinates[index]
-
-    def __xor__(self, other) -> "Vector":
-        """Overload the ^ operator for the cross product of two vectors."""
-        return self.__class__(
-            self.coordinates[1] * other.coordinates[2]
-            - self.coordinates[2] * other.coordinates[1],
-            self.coordinates[2] * other.coordinates[0]
-            - self.coordinates[0] * other.coordinates[2],
-            self.coordinates[0] * other.coordinates[1]
-            - self.coordinates[1] * other.coordinates[0],
-        )
-
-    # def __lshift__(self, shift_amount):
-    #     # Left bit shift for each coordinate
-    #     result_coordinates = [coord << shift_amount for coord in self.coordinates]
-    #     return self.__class__(*result_coordinates)
-
-    def dot(self, other: "Vector") -> Union["Vector", ArgumentError]:
-        """
-        Calculates the dot product of two vectors.
-
-        Args:
-            other (Vector): Another Vector object for the dot product.
-
-        Returns:
-            float: The dot product of the two vectors.
-        """
-        if isinstance(other, Vector) and len(self.coordinates) == len(
-            other.coordinates
-        ):
-            return sum(a * b for a, b in zip(self.coordinates, other.coordinates))
-        raise ArgumentError(
-            "Dot product is only defined for vectors of the same dimension."
-        )
-
-    def norm(self) -> float:
-        """
-        Calculates the Euclidean norm (length) of the vector.
-
-        Returns:
-            float: The Euclidean norm of the vector.
-        """
-        return sqrt(sum(comp**2 for comp in self.coordinates))
-
-    def normalize(self, l: int = 1) -> "Vector":
-        """
-        Normalizes the vector to a specified length.
-
-        Args:
-            l (float, optional): The desired length for the normalized vector. Defaults to 1.
-
-        Returns:
-            Vector: A new Vector representing the normalized vector.
-        """
-        length = self.norm()
-        return self.__class__(*[comp * l / length for comp in self.coordinates])
-
-class Vector2(Vector):
-    """
-    Vector2 Class
-
-    Represents a 2D vector with coordinates x and y.
-
-    ...
-
-    Attributes:
-        x (int, float): The x-coordinate of the vector.
-        y (int, float): The y-coordinate of the vector.
-
-    Methods:
-        __init__: Initializes a Vector2 object with given x and y coordinates.
-
-    Usage:
-        v = Vector2(1, 2)
-    """
-
-    def __init__(
-        self,
-        x: Union[int, float] = 0,
-        y: Union[int, float] = 0,
-    ) -> None:
-        """
-        Initializes a Vector2 object with given x and y coordinates.
-
-        Args:
-            x (int, float): The x-coordinate of the vector.
-            y (int, float): The y-coordinate of the vector.
-        """
-        super().__init__(x, y)
-        self.x, self.y = self.coordinates[0], self.coordinates[1]
-
-
-class Vector3(Vector):
-    """
-    Vector3 Class
-
-    Represents a 2D vector with coordinates x and y.
-
-    ...
-
-    Attributes:
-        x (int, float): The x-coordinate of the vector.
-        y (int, float): The y-coordinate of the vector.
-        z (int, float): The y-coordinate of the vector.
-
-    Methods:
-        __init__: Initializes a Vector2 object with given x and y coordinates.
-        cross: Calculates the cross product of two 3D Vector objects.
-
-    Usage:
-        v = Vector2(1, 2)
-    """
-
-    def __init__(
-        self,
-        x: Union[int, float] = 0,
-        y: Union[int, float] = 0,
-        z: Union[int, float] = 0,
-    ) -> None:
-        """
-        Initializes a Vector2 object with given x and y coordinates.
-
-        Args:
-            x (int, float): The x-coordinate of the vector.
-            y (int, float): The y-coordinate of the vector.
-            z (int, float): The z-coordinate of the vector.
-        """
-
-        super().__init__(x, y, z)
-        self.x, self.y, self.z = self.coordinates[0], self.coordinates[1], self.coordinates[2]
-
-    def cross(self, other: "Vector") -> "Vector":
-        """
-        Calculates the cross product of two 3D Vector objects.
-
-        Args:
-            other (Vector): Another 3D Vector object.
-
-        Returns:
-            Vector: A new Vector representing the cross product.
-
+            float: The value of the i-th component.
         Raises:
-            ArgumentError: If either of the vectors is not 3D.
+            IndexError: If the index is out of range.
         """
-        return self.__class__(
+        if i == 0:
+            return self.x
+        elif i == 1:
+            return self.y
+        else:
+            raise IndexError("Index out of range for Vector2")
+
+
+class Vector3:
+    """
+    A 3D vector class.
+
+    Attributes:
+        x (float): The x-coordinate of the vector.
+        y (float): The y-coordinate of the vector.
+        z (float): The z-coordinate of the vector.
+    """
+
+    def __init__(self, x: float = 0, y: float = 0, z: float = 0):
+        """
+        Initialize a 3D vector with given x, y, and z coordinates.
+
+        Args:
+            x (float): The x-coordinate.
+            y (float): The y-coordinate.
+            z (float): The z-coordinate.
+        """
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __str__(self) -> str:
+        """
+        Return a string representation of the vector.
+
+        Returns:
+            str: A string representation of the vector.
+        """
+        return f"({self.x}, {self.y}, {self.z})"
+
+    def __xor__(self, other: "Vector3") -> "Vector3":
+        """
+        Calculate the cross product of two vectors.
+
+        Args:
+            other (Vector3): The vector to calculate the cross product with.
+
+        Returns:
+            Vector3: The cross product of the two vectors.
+        """
+        return Vector3(
             self.y * other.z - self.z * other.y,
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x,
         )
 
-
-class RGB(Vector):
-    """
-    RGB Class
-
-    Represents an RGB color with red (r), green (g), and blue (b) components.
-
-    ...
-
-    Attributes:
-        r (int, float): The red component of the color.
-        g (int, float): The green component of the color.
-        b (int, float): The blue component of the color.
-
-    Methods:
-        __init__: Initializes an RGB object with given r, g, and b components.
-        __str__: Returns a string representation of the RGB object.
-
-    Usage:
-        color = RGB(255, 0, 0)
-    """
-
-    def __init__(
-        self,
-        r: Union[int, float] = 0,
-        g: Union[int, float] = 0,
-        b: Union[int, float] = 0,
-    ) -> None:
+    def __add__(self, other: "Vector3") -> "Vector3":
         """
-        Initializes an RGB object with given r, g, and b components.
+        Add two vectors element-wise.
 
         Args:
-            r (int, float): The red component of the color.
-            g (int, float): The green component of the color.
-            b (int, float): The blue component of the color.
-        """
-        super().__init__(r, g, b)
-        self.r, self.g, self.b = self.coordinates[0], self.coordinates[1], self.coordinates[2]
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the RGB object.
+            other (Vector3): The vector to be added.
 
         Returns:
-            str: A personalized string representation for RGB.
+            Vector3: The result of the addition.
         """
-        coordinates = f"(R: {self.r}, G: {self.g}, B: {self.b})"
-        return f"RGB Color {coordinates}"
+        if isinstance(other, Vector3):
+            return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
+        elif isinstance(other, (int, float)):
+            return Vector3(self.x + other, self.y + other, self.z + other)
+        else:
+            raise TypeError(f"Unsupported operand type for +: {type(other)}")
+
+    def __sub__(self, other: "Vector3") -> "Vector3":
+        """
+        Subtract two vectors element-wise.
+
+        Args:
+            other (Vector3): The vector to be subtracted.
+
+        Returns:
+            Vector3: The result of the subtraction.
+        """
+        return Vector3(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def __mul__(self, other: Union["Vector3", float, int]) -> "Vector3":
+        """
+        Element-wise multiplication of two vectors.
+
+        Args:
+            other (Union[int, float, Vector3]): The vector or scalar to multiply by.
+
+        Returns:
+            Vector3: The result of the multiplication.
+        """
+        if isinstance(other, (int, float)):
+            return Vector3(self.x * other, self.y * other, self.z * other)
+        elif isinstance(other, Vector3):
+            return Vector3(self.x * other.x, self.y * other.y, self.z * other.z)
+        else:
+            raise TypeError(f"Unsupported operand type for *: {type(other)}")
+
+    def __matmul__(self, other: "Vector3") -> float:
+        """
+        Calculate the dot product of two vectors.
+
+        Args:
+            other (Vector3): The vector to calculate the dot product with.
+
+        Returns:
+            float: The dot product of the two vectors.
+        """
+        return self.x * other.x + self.y * other.y + self.z * other.z
+
+    def norm(self) -> float:
+        """
+        Calculate the Euclidean norm (length) of the vector.
+
+        Returns:
+            float: The length of the vector.
+        """
+        return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
+
+    def normalize(self, l: float = 1) -> "Vector3":
+        """
+        Normalize the vector to a specified length (default is 1).
+
+        Args:
+            l (float): The desired length.
+
+        Returns:
+            Vector3: The normalized vector.
+        """
+        length = self.norm()
+        return Vector3(
+            self.x * (l / length), self.y * (l / length), self.z * (l / length)
+        )
+
+    def __getitem__(self, i: int) -> float:
+        """
+        Get the i-th component of the vector.
+
+        Args:
+            i (int): The index of the component.
+
+        Returns:
+            float: The value of the i-th component.
+        Raises:
+            IndexError: If the index is out of range.
+        """
+        if i == 0:
+            return self.x
+        elif i == 1:
+            return self.y
+        elif i == 2:
+            return self.z
+        else:
+            raise IndexError("Index out of range for Vector3")
+
+
+# Vector2 specialization for float and int
+class Vector2f(Vector2):
+    """Specialization of Vector2 for float."""
+
+    pass
+
+
+class Vector2i(Vector2):
+    """Specialization of Vector2 for int."""
+
+    pass
+
+
+# Vector3 specialization for float and int
+class Vector3f(Vector3):
+    """Specialization of Vector3 for float."""
+
+    pass
+
+
+class Vector3i(Vector3):
+    """Specialization of Vector3 for int."""
+
+    pass
