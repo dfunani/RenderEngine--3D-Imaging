@@ -1,82 +1,61 @@
-from models.images import Color, Image
-from models.geometry import Matrix
-from models.objects import Model
-from models.primitives import Triangle
-from models.vectors import Vector3f
+import math
+import numpy as np
+from typing import List
 
-WIDTH = 800  # WIDTH of the image
-HEIGHT = 600  # HEIGHT of the image
-DEPTH = 255
+Model = None  # Assume that you'll instantiate the Model class in your actual code
+width = 800
+height = 800
 
-def m2v(m: "Matrix") -> Vector3f:
-    return Vector3f(m[0][0]/m[3][0], m[1][0]/m[3][0], m[2][0]/m[3][0])
+light_dir = Vec3f(1, 1, 1)
+eye = Vec3f(0, -1, 3)
+center = Vec3f(0, 0, 0)
+up = Vec3f(0, 1, 0)
 
+class GouraudShader(IShader):
+    def __init__(self):
+        self.varying_intensity = Vec3f()
 
-def v2m(v: "Vector3f") -> Vector3f:
-    m = Matrix(4, 1)
-    m[0][0] = v.x
-    m[1][0] = v.y
-    m[2][0] = v.z
-    m[3][0] = 1.
-    return m
+    def vertex(self, iface, nthvert):
+        gl_Vertex = embed(model.vert(iface, nthvert), 4)
+        gl_Vertex = Viewport @ Projection @ ModelView @ gl_Vertex
+        self.varying_intensity[nthvert] = max(0.0, model.normal(iface, nthvert) @ light_dir)
+        return gl_Vertex
 
-def viewport(x: int, y: int, w: int, h: int) -> Matrix:
-    m = Matrix.identity(4)
-    m[0][3] = x + w / 2.0
-    m[1][3] = y + h / 2.0
-    m[2][3] = DEPTH / 2.0
+    def fragment(self, bar, color):
+        intensity = self.varying_intensity @ bar
+        color[0] = color[1] = color[2] = int(255 * intensity)
+        return False
 
-    m[0][0] = w / 2.0
-    m[1][1] = h / 2.0
-    m[2][2] = DEPTH / 2.0
-    return m
+def embed(v, length):
+    ret = Vec4f()
+    for i in range(length):
+        ret[i] = v[i] if i < len(v) else 1.0
+    return ret
 
-def render_model() -> None:
-    light_dir = Vector3f(0,0,-1)
-    camera = Vector3f(0,0,3)
-    model = Model("obj/african_head.obj")
+def main(argc, argv):
+    global model
+    if argc == 2:
+        model = Model(argv[1])
+    else:
+        model = Model("obj/african_head.obj")
 
-    zbuffer = [float('-inf')] * (WIDTH * HEIGHT)
+    lookat(eye, center, up)
+    viewport(width / 8, height / 8, width * 3 / 4, height * 3 / 4)
+    projection(-1.0 / (eye - center).norm())
+    light_dir.normalize()
 
-    projection = Matrix.identity(4)
-    view_port = viewport(WIDTH // 8, HEIGHT // 8, WIDTH * 3 // 4, HEIGHT * 3 // 4)
-    projection[3][2] = -1.0 / camera.z
+    image = TGAImage(width, height, TGAImage.RGB)
+    zbuffer = TGAImage(width, height, TGAImage.GRAYSCALE)
 
-    image = Image(WIDTH, HEIGHT, Image.RGB)
-
+    shader = GouraudShader()
     for i in range(model.nfaces()):
-        face = model.face(i)
-        screen_coords = []
-        world_coords = []
-
-        for j in range(3):
-            v = model.vert(face[j])
-            screen_coords.append(m2v(view_port * projection * v2m(v)))
-            world_coords.append(v)
-
-        n = (world_coords[2] - world_coords[0]) ^ (world_coords[1] - world_coords[0])
-        n.normalize()
-        intensity = n * light_dir
-
-        if intensity is not None and intensity.norm() > 0:
-            uv = [model.get_uv(i, k) for k in range(3)]
-            triangle = Triangle(screen_coords[0], screen_coords[1], screen_coords[2],
-                                uv[0], uv[1], uv[2], intensity, zbuffer)
-            triangle.render(image, model, WIDTH, HEIGHT)
+        screen_coords = [shader.vertex(i, j) for j in range(3)]
+        triangle(screen_coords, shader, image, zbuffer)
 
     image.flip_vertically()
-    image.write_image_file("output.tga")
+    zbuffer.flip_vertically()
+    image.write_tga_file("output.tga")
+    zbuffer.write_tga_file("zbuffer.tga")
 
-    zbimage = Image(WIDTH, HEIGHT, Image.GRAYSCALE)
-    for i in range(WIDTH):
-        for j in range(HEIGHT):
-            idx = i + j * WIDTH
-            if zbuffer[idx] > float('-inf'):
-                zbimage.set_pixel(i, j, Color(int(zbuffer[idx]), 1))
-            else:
-                # Set color for infinite z-buffer values to red (255, 0, 0)
-                zbimage.set_pixel(i, j, Color(255, 0, 0))
-
-
-    zbimage.flip_vertically()
-    zbimage.write_image_file("zbuffer.tga")
+if __name__ == "__main__":
+    main(2, ["program_name", "path/to/your/obj/file"])

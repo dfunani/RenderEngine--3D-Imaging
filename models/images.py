@@ -25,9 +25,15 @@ image.write_file("output.ext")
 """
 
 from PIL import Image, UnidentifiedImageError
-from numpy import array, fliplr, flipud
+from numpy import array, fliplr, flipud, zeros, uint8
 from models.types.exceptions import ObjectImageError
 
+class ObjectColor:
+    def __init__(self, r=0, g=0, b=0, a=255):
+        self.r = r
+        self.g = g
+        self.b = b
+        self.a = a
 
 class ObjectImage:
     """
@@ -35,11 +41,20 @@ class ObjectImage:
     image operations.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, width, height, color_format=ObjectColor) -> None:
         """
         Initialize ObjectImage object.
         """
-        self.image = None
+        self.width = width
+        self.height = height
+        self.color_format = color_format
+        self.pixels = zeros((width, height, 4), dtype=uint8)
+
+    def set(self, x, y, color):
+        self.pixels[x, y] = [color.r, color.g, color.b, color.a]
+
+    def get(self, x, y):
+        return self.pixels[x, y]
 
     def read_file(self, filename: str) -> bool:
         """
@@ -54,7 +69,7 @@ class ObjectImage:
         try:
             with Image.open(filename) as img:
                 data = array(img)
-                self.image = Image.fromarray(data)
+                self.pixels = Image.fromarray(data)
             return True
         except (TypeError, ValueError, FileNotFoundError, UnidentifiedImageError) as e:
             raise ObjectImageError(str(e)) from e
@@ -70,7 +85,7 @@ class ObjectImage:
         - bool: True if successful, False otherwise.
         """
         try:
-            self.image.save(filename)
+            self.pixels.save(filename)
             return True
         except (TypeError, ValueError, FileNotFoundError, UnidentifiedImageError) as e:
             raise ObjectImageError(str(e)) from e
@@ -82,8 +97,8 @@ class ObjectImage:
         Returns:
         - bool: True if successful, False if no image loaded.
         """
-        if self.image:
-            self.image = Image.fromarray(fliplr(array(self.image)))
+        if self.pixels:
+            self.pixels = Image.fromarray(fliplr(array(self.pixels)))
             return True
         return False
 
@@ -94,7 +109,7 @@ class ObjectImage:
         Returns:
         - bool: True if successful, False if no image loaded.
         """
-        if self.image:
-            self.image = Image.fromarray(flipud(array(self.image)))
+        if self.pixels:
+            self.pixels = Image.fromarray(flipud(array(self.pixels)))
             return True
         return False
