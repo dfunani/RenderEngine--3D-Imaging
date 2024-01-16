@@ -1,6 +1,6 @@
 from models.vectors import Vector3i, Vector2i, Vector3f
 from models.objects import Model
-from engines.imaging import Image, Color
+from models.images import Image, Color
 from models.geometry import Matrix
 
 

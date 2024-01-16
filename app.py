@@ -2,23 +2,16 @@
 Module Summary: This module renders a line and writes its information to a file.
 """
 
-from engines.renders import render_model
-
-
-def render_scene(filename="output/main") -> None:
-    render_model()
-    try:
-        pass
-    except (ValueError, TypeError, BaseException) as error:
-        return {
-        "message": "Error: Couldn't Create Scene",
-        "error": str(error),
-    }
-    return {
-        "message": "Successful: Created Scene and exported Successfully",
-        "error": "",
-    }
+from models.images import ObjectImage
+from models.types.exceptions import ObjectImageError
 
 
 if __name__ == "__main__":
-    print(render_scene())
+    # Example usage:
+    image = ObjectImage()
+    try:
+        if image.read_file("obj/african_head.obj"):
+            image.flip_vertically()
+            image.write_file("output.tga")
+    except ObjectImageError as e:
+        print(e)

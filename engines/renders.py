@@ -1,4 +1,4 @@
-from engines.imaging import Color, Image
+from models.images import Color, Image
 from models.geometry import Matrix
 from models.objects import Model
 from models.primitives import Triangle

@@ -4,7 +4,7 @@ This module defines the Model class for loading and representing 3D models.
 """
 
 from models.vectors import Vector3f, Vector3i, Vector2f, Vector2i
-from engines.imaging import Image, Color
+from models.images import Image, Color
 
 
 class Model:
