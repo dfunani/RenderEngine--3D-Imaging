@@ -4,7 +4,7 @@ from os import listdir, remove
 from pytest import raises
 from models.images import ObjectImage
 
-from models.types.exceptions import ObjectImageError
+from models.interfaces.exceptions import ObjectImageError
 
 image = ObjectImage()
 

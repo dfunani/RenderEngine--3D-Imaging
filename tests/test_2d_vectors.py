@@ -206,4 +206,4 @@ def test_2d_vector_cross():
     """
     v1, v2 = init_vector2(1, 2, 3, 4)
     result = v1.cross(v2)
-    assert result == -2
+    assert result == Vector2(2, -2)

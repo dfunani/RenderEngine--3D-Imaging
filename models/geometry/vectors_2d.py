@@ -26,10 +26,13 @@ Usage Example:
 """
 
 
+from math import sqrt
 from typing import Union
 
+from models.interfaces.vectors import Vector
 
-class Vector2:
+
+class Vector2(Vector):
     """
     A 2D vector class representing a point or direction in two-dimensional space.
 
@@ -107,6 +110,29 @@ class Vector2:
         'Vector2(3, 4.5)'
         """
         return f"Vector2({self.x}, {self.y})"
+
+    def __eq__(self, other: "Vector2") -> bool:
+        """
+        Check if two vectors are equal.
+
+        Parameters:
+        - other (Vector2): The vector to be compared.
+
+        Returns:
+        bool: True if the vectors are equal, False otherwise.
+
+        Example:
+        >>> vector1 = Vector2(1, 2)
+        >>> vector2 = Vector2(1, 2)
+        >>> vector3 = Vector2(3, 4)
+        >>> vector1 == vector2
+        True
+        >>> vector1 == vector3
+        False
+        """
+        if isinstance(other, Vector2):
+            return self.x == other.x and self.y == other.y
+        return False
 
     def __add__(
         self, other: Union["Vector2", int, float]
@@ -236,159 +262,41 @@ class Vector2:
         """
         return Vector2(-self.x, -self.y)
 
-    def __eq__(self, other: "Vector2") -> bool:
-        """
-        Check if two vectors are equal.
+    # def __getitem__(self, index: int) -> Union[float, IndexError]:
+    #     """
+    #     Gets the value at the specified index (0 or 1).
 
-        Parameters:
-        - other (Vector2): The vector to be compared.
+    #     Args:
+    #         index (int): The index of the component (0 for x, 1 for y).
 
-        Returns:
-        bool: True if the vectors are equal, False otherwise.
+    #     Returns:
+    #         float: The value of the component at the specified index.
 
-        Example:
-        >>> vector1 = Vector2(1, 2)
-        >>> vector2 = Vector2(1, 2)
-        >>> vector3 = Vector2(3, 4)
-        >>> vector1 == vector2
-        True
-        >>> vector1 == vector3
-        False
-        """
-        if isinstance(other, Vector2):
-            return self.x == other.x and self.y == other.y
-        return False
+    #     Raises:
+    #         IndexError: If the index is out of range (not 0 or 1).
+    #     """
+    #     if index == 0:
+    #         return self.x
+    #     if index == 1:
+    #         return self.y
+    #     raise IndexError("Vector2 index out of range")
 
-    def __ne__(self, other: "Vector2") -> bool:
-        """
-        Check if two vectors are not equal.
+    # def __setitem__(self, index: int, value: float) -> Union[IndexError, None]:
+    #     """
+    #     Sets the value at the specified index (0 or 1).
 
-        Parameters:
-        - other (Vector2): The vector to be compared.
+    #     Args:
+    #         index (int): The index of the component (0 for x, 1 for y).
+    #         value (float): The new value for the component.
 
-        Returns:
-        bool: True if the vectors are not equal, False otherwise.
-
-        Example:
-        >>> vector1 = Vector2(1, 2)
-        >>> vector2 = Vector2(3, 4)
-        >>> vector1 != vector2
-        True
-        """
-        return not self.__eq__(other)
-
-    def __lt__(self, other: "Vector2") -> bool:
-        """
-        Check if the vector is less than another vector.
-
-        Parameters:
-        - other (Vector2): The vector to be compared.
-
-        Returns:
-        bool: True if the vector is less than the other, False otherwise.
-
-        Raises:
-        TypeError: If the operand type is not supported.
-
-        Example:
-        >>> vector1 = Vector2(1, 2)
-        >>> vector2 = Vector2(3, 4)
-        >>> vector1 < vector2
-        True
-        """
-        if isinstance(other, Vector2):
-            return self.x < other.x and self.y < other.y
-        raise TypeError(f"Unsupported operand type: {type(other)}")
-
-    def __le__(self, other: "Vector2") -> bool:
-        """
-        Check if the vector is less than or equal to another vector.
-
-        Parameters:
-        - other (Vector2): The vector to be compared.
-
-        Returns:
-        bool: True if the vector is less than or equal to the other, False otherwise.
-
-        Example:
-        >>> vector1 = Vector2(1, 2)
-        >>> vector2 = Vector2(3, 4)
-        >>> vector1 <= vector2
-        True
-        """
-        return self.__lt__(other) or self.__eq__(other)
-
-    def __gt__(self, other: "Vector2") -> bool:
-        """
-        Check if the vector is greater than another vector.
-
-        Parameters:
-        - other (Vector2): The vector to be compared.
-
-        Returns:
-        bool: True if the vector is greater than the other, False otherwise.
-
-        Example:
-        >>> vector1 = Vector2(3, 4)
-        >>> vector2 = Vector2(1, 2)
-        >>> vector1 > vector2
-        True
-        """
-        return not self.__le__(other)
-
-    def __ge__(self, other: "Vector2") -> bool:
-        """
-        Check if the vector is greater than or equal to another vector.
-
-        Parameters:
-        - other (Vector2): The vector to be compared.
-
-        Returns:
-        bool: True if the vector is greater than or equal to the other, False otherwise.
-
-        Example:
-        >>> vector1 = Vector2(3, 4)
-        >>> vector2 = Vector2(1, 2)
-        >>> vector1 >= vector2
-        True
-        """
-        return not self.__lt__(other)
-
-    def __getitem__(self, index: int) -> Union[float, IndexError]:
-        """
-        Gets the value at the specified index (0 or 1).
-
-        Args:
-            index (int): The index of the component (0 for x, 1 for y).
-
-        Returns:
-            float: The value of the component at the specified index.
-
-        Raises:
-            IndexError: If the index is out of range (not 0 or 1).
-        """
-        if index == 0:
-            return self.x
-        if index == 1:
-            return self.y
-        raise IndexError("Vector2 index out of range")
-
-    def __setitem__(self, index: int, value: float) -> Union[IndexError, None]:
-        """
-        Sets the value at the specified index (0 or 1).
-
-        Args:
-            index (int): The index of the component (0 for x, 1 for y).
-            value (float): The new value for the component.
-
-        Raises:
-            IndexError: If the index is out of range (not 0 or 1).
-        """
-        if index == 0:
-            self.x = value
-        elif index == 1:
-            self.y = value
-        raise IndexError("Vector2 index out of range")
+    #     Raises:
+    #         IndexError: If the index is out of range (not 0 or 1).
+    #     """
+    #     if index == 0:
+    #         self.x = value
+    #     elif index == 1:
+    #         self.y = value
+    #     raise IndexError("Vector2 index out of range")
 
     def __pow__(self, exponent: float) -> "Vector2":
         """
@@ -410,77 +318,6 @@ class Vector2:
             Vector2: A new Vector2 instance with the same components.
         """
         return Vector2(self.x, self.y)
-
-    def length(self) -> float:
-        """
-        Calculate the length (magnitude) of the vector.
-
-        Returns:
-        float: The length of the vector.
-
-        Example:
-        >>> vector = Vector2(3, 4)
-        >>> vector.length()
-        5.0
-        """
-        return (self.x**2 + self.y**2) ** 0.5
-
-    def length_squared(self) -> float:
-        """
-        Calculates the squared length of the vector.
-
-        Returns:
-            float: The squared length of the vector.
-        """
-        return self.x**2 + self.y**2
-
-    def cross(self, other: "Vector2") -> float:
-        """
-        Calculates the "cross product" of two 2D vectors.
-
-        Parameters:
-            other (Vector2): The other vector.
-
-        Returns:
-            float: The "cross product" of the two vectors.
-
-        Raises:
-            TypeError: If the operand type is not supported.
-
-        Note:
-            This is a custom definition for a cross product in 2D, which may not align
-            with the traditional cross product definition in 3D.
-        """
-        if isinstance(other, Vector2):
-            return self.x * other.y - self.y * other.x
-        raise TypeError(f"Unsupported operand type: {type(other)}")
-
-    def norm(self) -> float:
-        """
-        Calculates the Euclidean norm of the vector.
-
-        Returns:
-            float: The Euclidean norm of the vector.
-        """
-        return (self.length_squared()) ** 0.5
-
-    def normalize(self) -> "Vector2":
-        """
-        Normalize the vector, returning a new vector with the same direction and a length of 1.
-
-        Returns:
-        Vector2: The normalized vector.
-
-        Example:
-        >>> vector = Vector2(3, 4)
-        >>> normalized_vector = vector.normalize()
-        >>> repr(normalized_vector)
-        'Vector2(0.6, 0.8)'
-        """
-        length = self.length()
-        if length != 0:
-            return self / length
-        return Vector2()
 
     def dot(self, other: "Vector2") -> Union[float, TypeError]:
         """
@@ -505,6 +342,78 @@ class Vector2:
         if isinstance(other, Vector2):
             return self.x * other.x + self.y * other.y
         raise TypeError(f"Unsupported operand type: {type(other)}")
+
+    def length(self) -> float:
+        """
+        Calculate the length (magnitude) of the vector.
+
+        Returns:
+        float: The length of the vector.
+
+        Example:
+        >>> vector = Vector2(3, 4)
+        >>> vector.length()
+        5.0
+        """
+        return sqrt(self.x**2 + self.y**2)
+
+    def length_squared(self) -> float:
+        """
+        Calculates the squared length of the vector.
+
+        Returns:
+            float: The squared length of the vector.
+        """
+        return self.x**2 + self.y**2
+
+    def normalize(self) -> "Vector2":
+        """
+        Normalize the vector, returning a new vector with the same direction and a length of 1.
+
+        Returns:
+        Vector2: The normalized vector.
+
+        Example:
+        >>> vector = Vector2(3, 4)
+        >>> normalized_vector = vector.normalize()
+        >>> repr(normalized_vector)
+        'Vector2(0.6, 0.8)'
+        """
+        length = self.length()
+        if length != 0:
+            return self / length
+        return Vector2()
+
+    def norm(self) -> float:
+        """
+        Calculates the Euclidean norm of the vector.
+
+        Returns:
+            float: The Euclidean norm of the vector.
+        """
+        return sqrt(self.length_squared())
+
+    def cross(self, other: "Vector2") -> "Vector2":
+        """
+        Calculates the "cross product" of two 2D vectors.
+
+        Parameters:
+            other (Vector2): The other vector.
+
+        Returns:
+            float: The "cross product" of the two vectors.
+
+        Raises:
+            TypeError: If the operand type is not supported.
+
+        Note:
+            This is a custom definition for a cross product in 2D, which may not align
+            with the traditional cross product definition in 3D.
+        """
+        return Vector2(
+            self.y * other.x - self.x * other.y,
+            self.x * other.y - self.y * other.x,
+        )
 
     def to_tuple(self) -> tuple[int, int]:
         """

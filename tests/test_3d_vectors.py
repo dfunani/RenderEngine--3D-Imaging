@@ -1,5 +1,5 @@
 """
-test_2d_vectors.py - Test module for the Vector3 class representing 3D vectors.
+test_3d_vectors.py - Test module for the Vector3 class representing 3D vectors.
 
 This module contains a set of unit tests to ensure the correct functionality
 of the Vector3 class, which represents 3D vectors. The tests cover various
@@ -31,11 +31,6 @@ Usage:
 
     If all tests pass, a success message will be displayed.
 
-Author:
-    [Your Name]
-
-Date:
-    [Current Date]
 """
 
 from math import isclose

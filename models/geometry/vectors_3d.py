@@ -13,8 +13,10 @@ Usage Example:
 from math import sqrt
 from typing import Union
 
+from models.interfaces.vectors import Vector
 
-class Vector3:
+
+class Vector3(Vector):
     """
     A 3D vector class representing a point or direction in three-dimensional space.
 
@@ -71,32 +73,9 @@ class Vector3:
 
     def __eq__(self, other: "Vector3") -> bool:
         """Check if two vectors are equal."""
-        return (
-            isinstance(other, Vector3)
-            and self.x == other.x
-            and self.y == other.y
-            and self.z == other.z
-        )
-
-    def __ne__(self, other: "Vector3") -> bool:
-        """Check if two vectors are not equal."""
-        return not self.__eq__(other)
-
-    def __gt__(self, other: "Vector3") -> bool:
-        """Compare vectors based on magnitude."""
-        return self.length() > other.length()
-
-    def __ge__(self, other: "Vector3") -> bool:
-        """Check if the magnitude of the vector is greater than or equal to another."""
-        return self.length() >= other.length()
-
-    def __lt__(self, other: "Vector3") -> bool:
-        """Check if the magnitude of the vector is less than another."""
-        return self.length() < other.length()
-
-    def __le__(self, other: "Vector3") -> bool:
-        """Check if the magnitude of the vector is less than or equal to another."""
-        return self.length() <= other.length()
+        if isinstance(other, Vector3):
+            return self.x == other.x and self.y == other.y and self.z == other.z
+        return False
 
     def __add__(
         self, other: Union["Vector3", int, float]
@@ -129,42 +108,46 @@ class Vector3:
         raise TypeError(f"Unsupported operand type for *: {other}")
 
     def __truediv__(
-        self, scalar: Union[int, float]
-    ) -> Union["Vector3", ZeroDivisionError]:
-        """Divide the vector by a scalar."""
-        if scalar == 0:
+        self, other: Union["Vector3", int, float]
+    ) -> Union["Vector3", ZeroDivisionError, TypeError]:
+        """Divide the vector by a vector or scalar."""
+        if isinstance(other, Vector3):
+            return Vector3(self.x / other.x, self.y / other.y, self.z / other.z)
+        if isinstance(other, (int, float)):
+            if other != 0:
+                return Vector3(self.x / other, self.y / other, self.z / other)
             raise ZeroDivisionError("Division by zero")
-        return Vector3(self.x / scalar, self.y / scalar, self.z / scalar)
-
-    def __getitem__(self, index: int) -> Union[IndexError, int, float]:
-        """Get the value at the specified index (0, 1, or 2)."""
-        if index == 0:
-            return self.x
-        if index == 1:
-            return self.y
-        if index == 2:
-            return self.z
-        raise IndexError("Vector3 index out of range")
-
-    def __setitem__(
-        self, index: int, value: Union[int, float, "Vector3"]
-    ) -> Union[None, IndexError]:
-        """Set the value at the specified index (0, 1, or 2)."""
-        if index == 0:
-            self.x = value
-        if index == 1:
-            self.y = value
-        if index == 2:
-            self.z = value
-        raise IndexError("Vector3 index out of range")
-
-    def __pow__(self, exponent: Union[int, float]) -> "Vector3":
-        """Raise each component to the specified exponent."""
-        return Vector3(self.x**exponent, self.y**exponent, self.z**exponent)
+        raise TypeError(f"Unsupported operand type: {type(other)}")
 
     def __neg__(self) -> "Vector3":
         """Return the negation of the vector."""
         return Vector3(-self.x, -self.y, -self.z)
+
+    # def __getitem__(self, index: int) -> Union[IndexError, int, float]:
+    #     """Get the value at the specified index (0, 1, or 2)."""
+    #     if index == 0:
+    #         return self.x
+    #     if index == 1:
+    #         return self.y
+    #     if index == 2:
+    #         return self.z
+    #     raise IndexError("Vector3 index out of range")
+
+    # def __setitem__(
+    #     self, index: int, value: Union[int, float, "Vector3"]
+    # ) -> Union[None, IndexError]:
+    #     """Set the value at the specified index (0, 1, or 2)."""
+    #     if index == 0:
+    #         self.x = value
+    #     if index == 1:
+    #         self.y = value
+    #     if index == 2:
+    #         self.z = value
+    #     raise IndexError("Vector3 index out of range")
+
+    def __pow__(self, exponent: Union[int, float]) -> "Vector3":
+        """Raise each component to the specified exponent."""
+        return Vector3(self.x**exponent, self.y**exponent, self.z**exponent)
 
     def __pos__(self) -> "Vector3":
         """Return a copy of the vector."""
@@ -172,15 +155,9 @@ class Vector3:
 
     def dot(self, other: "Vector3") -> Union[int, float]:
         """Calculate the dot product with another vector."""
-        return self.x * other.x + self.y * other.y + self.z * other.z
-
-    def cross(self, other: "Vector3") -> "Vector3":
-        """Calculate the cross product with another vector."""
-        return Vector3(
-            self.y * other.z - self.z * other.y,
-            self.z * other.x - self.x * other.z,
-            self.x * other.y - self.y * other.x,
-        )
+        if isinstance(other, Vector3):
+            return self.x * other.x + self.y * other.y + self.z * other.z
+        raise TypeError(f"Unsupported operand type: {type(other)}")
 
     def length(self) -> float:
         """Calculate the length (magnitude) of the vector."""
@@ -200,3 +177,11 @@ class Vector3:
     def norm(self) -> float:
         """Calculate the Euclidean norm of the vector."""
         return sqrt(self.length_squared())
+
+    def cross(self, other: "Vector3") -> "Vector3":
+        """Calculate the cross product with another vector."""
+        return Vector3(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+        )

@@ -11,7 +11,7 @@ from models.geometry import (
     projection,
     viewport,
 )
-from models.types.exceptions import ObjectImageError
+from models.interfaces.exceptions import ObjectImageError
 from models.vectors import Matrix, Vector2, Vector3
 
 """
@@ -53,8 +53,8 @@ from models.geometry import (
     projection,
     viewport,
 )
-from models.types.exceptions import ObjectImageError
-from models.types.interfaces import IShader
+from models.interfaces.exceptions import ObjectImageError
+from models.interfaces.shaders import IShader
 from models.vectors import Matrix, Vector2, Vector3
 
 
