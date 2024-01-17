@@ -2,14 +2,15 @@
 Module Summary: This module renders a line and writes its information to a file.
 """
 
-from models.images import ObjectImage
-from models.objects import Model
-from models.types.exceptions import ObjectImageError
+from models.objects import ObjectCamera, ObjectModel, ObjectImage
 
 
 if __name__ == "__main__":
     # Example usage:
-    model = Model("obj/african_head.obj")
+    model = ObjectModel("obj/african_head.obj")
+    camera = ObjectCamera()
+    image = ObjectImage(800, 600)
+    image.render_model(model, camera)
     # image = ObjectImage()
     # try:
     #     if image.read_file("obj/african_head.obj"):
