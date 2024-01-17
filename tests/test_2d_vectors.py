@@ -44,6 +44,7 @@ def test_2d_vector():
     Test for basic initialization of Vector2 instances.
     """
     v1, v2 = init_vector2()
+    assert v1 and v2
 
 
 def test_2d_vector_error_1():
@@ -51,7 +52,7 @@ def test_2d_vector_error_1():
     Test for raising TypeError when an invalid argument is provided.
     """
     with raises(TypeError):
-        v1, v2 = init_vector2("")
+        init_vector2("")
 
 
 def test_2d_vector_error_2():
@@ -59,7 +60,7 @@ def test_2d_vector_error_2():
     Test for raising TypeError when invalid arguments are provided.
     """
     with raises(TypeError):
-        v1, v2 = init_vector2(1, 3, 4, "")
+        init_vector2(1, 3, 4, "")
 
 
 def test_2d_vector_error_3():
@@ -67,7 +68,7 @@ def test_2d_vector_error_3():
     Test for raising TypeError when an invalid argument is provided.
     """
     with raises(TypeError):
-        v1, v2 = init_vector2(v1_x="")
+        init_vector2(v1_x="")
 
 
 def test_2d_vector_eq():

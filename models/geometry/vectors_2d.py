@@ -108,12 +108,14 @@ class Vector2:
         """
         return f"Vector2({self.x}, {self.y})"
 
-    def __add__(self, other: Union["Vector2", float]) -> Union["Vector2", TypeError]:
+    def __add__(
+        self, other: Union["Vector2", int, float]
+    ) -> Union["Vector2", TypeError]:
         """
         Add two vectors or add a scalar to the vector.
 
         Parameters:
-        - other (Union["Vector2", float]): The vector or scalar to be added.
+        - other (Union["Vector2", int, float]): The vector or scalar to be added.
 
         Returns:
         Vector2: The result of the addition.
@@ -134,12 +136,14 @@ class Vector2:
             return Vector2(self.x + other, self.y + other)
         raise TypeError(f"Unsupported operand type: {type(other)}")
 
-    def __sub__(self, other: Union["Vector2", float]) -> Union["Vector2", TypeError]:
+    def __sub__(
+        self, other: Union["Vector2", int, float]
+    ) -> Union["Vector2", TypeError]:
         """
         Subtract two vectors or subtract a scalar from the vector.
 
         Parameters:
-        - other (Union["Vector2", float]): The vector or scalar to be subtracted.
+        - other (Union["Vector2", int, float]): The vector or scalar to be subtracted.
 
         Returns:
         Vector2: The result of the subtraction.
@@ -160,12 +164,14 @@ class Vector2:
             return Vector2(self.x - other, self.y - other)
         raise TypeError(f"Unsupported operand type: {type(other)}")
 
-    def __mul__(self, other: Union["Vector2", float]) -> Union["Vector2", TypeError]:
+    def __mul__(
+        self, other: Union["Vector2", int, float]
+    ) -> Union["Vector2", TypeError]:
         """
         Multiply the vector by another vector or by a scalar.
 
         Parameters:
-        - other (Union["Vector2", float]): The vector or scalar to be multiplied.
+        - other (Union["Vector2", int, float]): The vector or scalar to be multiplied.
 
         Returns:
         Vector2: The result of the multiplication.
@@ -186,13 +192,13 @@ class Vector2:
         raise TypeError(f"Unsupported operand type: {type(other)}")
 
     def __truediv__(
-        self, other: Union["Vector2", float]
+        self, other: Union["Vector2", int, float]
     ) -> Union["Vector2", TypeError]:
         """
         Divide the vector by another vector or by a scalar.
 
         Parameters:
-        - other (Union["Vector2", float]): The vector or scalar to be divided.
+        - other (Union["Vector2", int, float]): The vector or scalar to be divided.
 
         Returns:
         Vector2: The result of the division.
@@ -363,7 +369,7 @@ class Vector2:
         """
         if index == 0:
             return self.x
-        elif index == 1:
+        if index == 1:
             return self.y
         raise IndexError("Vector2 index out of range")
 
